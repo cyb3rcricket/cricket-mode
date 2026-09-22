@@ -102,6 +102,10 @@ After the skills are available to your coding agent, invoke them directly:
 
 The commands are intentionally small. They are meant to change how the agent approaches a task, not introduce a giant workflow framework.
 
+## Examples
+
+Annotated before/after transcripts in [`examples/`](examples/) are proof that each skill changes what the agent says and does.
+
 ## Philosophy
 
 Start with the smallest instruction that reliably changes behavior.
