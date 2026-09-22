@@ -15,7 +15,7 @@ Explain:
 
 - what you did,
 - how it works,
-- why you chose that approach,
+- why that approach was used, based on the available work and context,
 - how the important pieces connect,
 - and what pattern I should recognize or reuse next time.
 
@@ -24,6 +24,8 @@ Use the actual code or work you just produced when that helps.
 Teach the mechanism, not just the syntax.
 
 When there is a reusable pattern, point it out plainly and show me what parts will usually change versus what parts tend to stay the same.
+
+Do not invent design rationale that is not supported by the work or conversation.
 
 Assume I am learning. Do not assume I know technical terms, but do not talk down to me.
 
