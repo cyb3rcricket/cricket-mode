@@ -2,7 +2,7 @@
 
 Small, focused agent skills for working better with coding agents.
 
-Cricket Mode adds a handful of slash-command behaviors for common moments in AI-assisted development: simplify an explanation, teach the code that was just written, challenge an implementation, prove that something actually works, or find where a project has drifted out of sync.
+Cricket Mode adds a handful of slash-command behaviors for common moments in AI-assisted development: simplify an explanation, teach the code that was just written, challenge an implementation, prove that something actually works, find where a project has drifted out of sync, or scrub leftover agent fingerprints.
 
 Each skill does one thing.
 
@@ -15,6 +15,7 @@ Each skill does one thing.
 | `/challenge` | Tries to break the work before you trust it. Looks for bugs, weak assumptions, edge cases, and unintended behavior. |
 | `/prove-it` | Verifies the real behavior and shows evidence instead of merely claiming the work is correct. |
 | `/drift` | Finds places where the project no longer agrees with itself, such as code vs. tests, docs vs. behavior, or config vs. reality. |
+| `/scrub` | Finds leftover agent fingerprints in recent work, such as narrating comments, speculative helpers, and redundant wrappers, and proposes surgical removal. |
 
 ## Why Cricket Mode?
 
@@ -26,7 +27,8 @@ That creates a few recurring problems:
 - generated code can be hard to learn from,
 - plausible-looking implementations can hide mistakes,
 - passing code can still fail in the real application,
-- and fast-moving repositories can slowly contradict themselves.
+- fast-moving repositories can slowly contradict themselves,
+- and agent output can leave fingerprints that make the code noisier.
 
 Cricket Mode gives each of those moments a simple command.
 
@@ -36,6 +38,7 @@ Cricket Mode gives each of those moments a simple command.
 /challenge  Try to break it before we trust it.
 /prove-it   Don't tell me it works. Prove it.
 /drift      Find where the project disagrees with itself.
+/scrub      Strip the agent fingerprints. Don't redesign the work.
 ```
 
 ## Installation
@@ -84,6 +87,10 @@ After the skills are available to your coding agent, invoke them directly:
 
 ```text
 /drift
+```
+
+```text
+/scrub
 ```
 
 The commands are intentionally small. They are meant to change how the agent approaches a task, not introduce a giant workflow framework.
