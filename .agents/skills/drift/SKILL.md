@@ -25,7 +25,7 @@ For each finding, show:
 
 - what says one thing,
 - what says something different,
-- which behavior appears current,
+- which behavior appears current based on the available evidence, or say when it is unclear,
 - and what likely needs attention.
 
 Use the actual project files as evidence.
