@@ -28,8 +28,8 @@ Test the real behavior.
 
 Finish with a concise result:
 
-**PASS** — what was verified and the evidence.
+**PASS** — the requested behavior was verified and the evidence.
 
-or
+**FAIL** — the behavior failed and the evidence.
 
-**FAIL** — what failed and what the evidence showed.
+**PARTIAL** — some behavior was verified, but clearly state what remains unverified.
