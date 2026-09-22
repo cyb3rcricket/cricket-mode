@@ -1,6 +1,6 @@
 ---
 name: challenge
-description: Critically reviews the work just completed, looking for mistakes, weak assumptions, edge cases, and ways it could fail.
+description: Use when recent work looks finished but should not be trusted yet — inspect it for bugs, weak assumptions, edge cases, missing error handling, and side effects, and report findings without fixing unless asked.
 ---
 
 # Challenge

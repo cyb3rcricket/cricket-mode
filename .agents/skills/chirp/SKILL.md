@@ -1,6 +1,6 @@
 ---
 name: chirp
-description: Restates the previous response more simply and clearly.
+description: Use when the last reply was dense, jargony, or too long and needs that same meaning restated shorter in plain language, ending with a one- or two-sentence Basically.
 ---
 
 Restate your last message in plain, conversational language.
