@@ -1,6 +1,6 @@
 ---
 name: senpai
-description: Teaches the user how work the agent just performed actually works, why it was done that way, and what reusable pattern to recognize next time.
+description: Use when the user wants to learn the work just built or changed — what was done, how it works, why that approach was used, and which pattern to reuse — without redoing the work.
 ---
 
 # Senpai

@@ -1,6 +1,6 @@
 ---
 name: prove-it
-description: Verifies that the work just completed actually works by testing the real behavior and showing evidence.
+description: Use when someone claims a change works and you need to exercise the real behavior, then finish with PASS, FAIL, or PARTIAL and the evidence — not a code-reading summary.
 ---
 
 # Prove It

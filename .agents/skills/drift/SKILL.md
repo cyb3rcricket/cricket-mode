@@ -1,6 +1,6 @@
 ---
 name: drift
-description: Finds places where a project no longer agrees with itself.
+description: Use when the project may disagree with itself — code vs tests, docs or comments vs behavior, config vs runtime, examples vs interfaces, or setup vs real requirements — and you need the concrete mismatch, not a stale-file list.
 ---
 
 # Drift
