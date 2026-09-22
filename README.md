@@ -106,6 +106,34 @@ The commands are intentionally small. They are meant to change how the agent app
 
 Annotated before/after transcripts in [`examples/`](examples/) are proof that each skill changes what the agent says and does.
 
+## Suggested combos
+
+These are optional habits, not a required workflow. The skills stay independent.
+
+**`/pitch`**
+
+Before building, clamp the work to what was asked.
+
+**`/challenge` then `/prove-it`**
+
+Attack the idea, then demand evidence on what survived.
+
+**`/senpai`**
+
+After a non-trivial change, once the work is in, learn the pattern before moving on.
+
+**`/scrub`**
+
+After a messy agent turn, strip leftover fingerprints without redesigning the work.
+
+**`/drift`**
+
+After a big session or multi-file change, catch where the repo started disagreeing with itself.
+
+**`/chirp`**
+
+After a dense explanation, including a long `/senpai`, restate it more simply.
+
 ## Philosophy
 
 Start with the smallest instruction that reliably changes behavior.
