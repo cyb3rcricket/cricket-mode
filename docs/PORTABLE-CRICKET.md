@@ -80,13 +80,9 @@ Should we retry?       → agent judgment may help
 
 ## Deliberately not built yet
 
-Do not assume these exist just because the scaffold exists:
+Do not assume these exist:
 
-- automatic Codex installation,
-- automatic Cursor installation,
-- automatic Antigravity installation,
 - a universal command registry,
-- a one-command installer,
 - model routing,
 - Luna/Sol escalation,
 - Jev integration,
@@ -118,18 +114,35 @@ Chose Cursor. The other adapters were left for later.
 
 **Antigravity (adapter written).** `adapters/antigravity/` exposes the seven commands as Antigravity skills. The documented invoke is `/name`. Official skill frontmatter has no switch that disables autonomous activation. `adapters/antigravity/check.py` installs the tree and runs `conformance/check.py`. Opening Antigravity is still required before calling the live behavior verified. See `adapters/antigravity/README.md`.
 
-### Phase 5 — installation/update tooling
+### Phase 5 — installation/update tooling (done)
 
-Only after adapters work, consider a tiny installer such as:
+`python3 cricket` copies one adapter out of this checkout. It is not a package manager. The contract bytes always come from `core/COMMANDS.md`. The script never writes that file.
 
 ```text
-cricket install codex
-cricket install cursor
-cricket install antigravity
-cricket update
+python3 cricket install cursor --target /path/to/project
+python3 cricket install codex --target /path/to/project
+python3 cricket install antigravity --target /path/to/project
+python3 cricket update --target /path/to/project
+python3 cricket test
 ```
 
-Do not build a package manager unless reality demands one.
+`--target` defaults to the current directory. The command is `python3 cricket` because the script has no install step of its own.
+
+| Adapter | Files created or replaced |
+| --- | --- |
+| cursor | `.cursor/skills/<command>/SKILL.md` and `.cursor/skills/cricket-contract/COMMANDS.md` |
+| codex | `.agents/skills/<command>/SKILL.md`, `.agents/skills/<command>/agents/openai.yaml`, and `.agents/skills/cricket-contract/COMMANDS.md` |
+| antigravity | `.agents/skills/<command>/SKILL.md` and `.agents/skills/cricket-contract/COMMANDS.md` |
+
+`<command>` is `pitch`, `chirp`, `senpai`, `challenge`, `prove-it`, `drift`, and `scrub`. Each installed `SKILL.md` contains the line `Cricket adapter: cursor`, `Cricket adapter: codex`, or `Cricket adapter: antigravity`. That line is how the script tells an adapter install from a reference skill.
+
+`update` replaces an installed `cricket-contract/COMMANDS.md` from `core/COMMANDS.md` when `pitch/SKILL.md` carries one of those lines. It does not replace skill files.
+
+A repeat install of the same adapter replaces that adapter's skill folders and writes the contract again. If `COMMANDS.md` is a symlink, the script unlinks it and writes a regular file. It does not copy through the link.
+
+Codex and Antigravity both use `.agents/skills`. This repository keeps its reference skills in that same directory. Those reference files are not stamped, and Codex and Antigravity stamps are different. The installer refuses the install when any of the seven skill paths is unstamped or stamped for the other host, and it writes nothing. It does not merge the two adapters, and it does not overwrite the reference skills. Install Codex or Antigravity into another project. Cursor writes `.cursor/skills`, so it can sit beside `.agents/skills`.
+
+`python3 cricket test` runs those cases in a temporary directory.
 
 ### Phase 6 — optional orchestration
 
@@ -160,11 +173,11 @@ A one-command installer is useful but not required for portable-v1.
 
 ## If we get sidetracked, resume here
 
-The Antigravity adapter is written. Resume at Phase 5: a small installer. Do not start Phase 6.
+The installer is `python3 cricket`. Do not start Phase 6.
 
 1. Read this file.
 2. Read `adapters/antigravity/README.md` and `conformance/README.md`.
-3. Add the small installer in Phase 5. Leave model routing and the other Phase 6 ideas alone.
+3. Leave model routing and the other Phase 6 ideas alone. Live host checks are still open; the adapter checks do not open Cursor, Codex, or Antigravity.
 
 The central question is:
 

@@ -70,10 +70,11 @@ cricket-mode/
 │   ├── README.md             # adapter contract
 │   ├── codex/                # Codex skills invoked as $name
 │   ├── cursor/               # Cursor skills wired to core/COMMANDS.md
-│   └── antigravity/README.md
+│   └── antigravity/          # Antigravity skills invoked as /name
 ├── conformance/              # shared reply checks for the seven commands
 ├── docs/
 │   └── PORTABLE-CRICKET.md   # architecture + resume plan
+├── cricket                   # install or update one adapter
 ├── AGENTS.md
 └── examples/
 ```
@@ -84,7 +85,7 @@ The currently working reference skills live in `.agents/skills/`.
 
 Copy any skill you want into an agent environment that supports the current skill format. You can install only the skills you want.
 
-**Important:** Cursor, Codex, and Antigravity adapters are implemented. Install notes are in each adapter README. Shared reply checks are in `conformance/`. Live Antigravity behavior has not been opened from this environment. There is no one-command installer yet.
+**Important:** Cursor, Codex, and Antigravity adapters are implemented. From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. `python3 cricket update --target /path/to/project` refreshes an installed contract copy. Install notes are in each adapter README. Shared reply checks are in `conformance/`. Live Antigravity behavior has not been opened from this environment.
 
 ## Usage
 
@@ -138,7 +139,7 @@ Cricket Mode is early and experimental.
 | Cursor adapter | Implemented. Explicit skills wired to the core contract |
 | Shared conformance checks | Seven command cases in `conformance/` |
 | Antigravity adapter | Implemented as `/name` skills. Live app not run |
-| One-command installer | Planned |
+| One-command installer | `python3 cricket install` for cursor, codex, or antigravity |
 
 ## License
 

@@ -1,0 +1,300 @@
+#!/usr/bin/env python3
+"""Install one Cricket adapter, or refresh an installed contract copy.
+
+Usage:
+  python3 cricket install cursor|codex|antigravity [--target DIR]
+  python3 cricket update [--target DIR]
+  python3 cricket test
+
+This is not a package manager. It copies one adapter out of this checkout.
+The contract bytes always come from core/COMMANDS.md. The command never
+writes that file.
+"""
+
+from __future__ import annotations
+
+import filecmp
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+CORE = ROOT / "core" / "COMMANDS.md"
+COMMANDS = [
+    "pitch",
+    "chirp",
+    "senpai",
+    "challenge",
+    "prove-it",
+    "drift",
+    "scrub",
+]
+ADAPTERS = ("cursor", "codex", "antigravity")
+DEST = {
+    "cursor": Path(".cursor/skills"),
+    "codex": Path(".agents/skills"),
+    "antigravity": Path(".agents/skills"),
+}
+STAMP = {
+    "cursor": "Cricket adapter: cursor",
+    "codex": "Cricket adapter: codex",
+    "antigravity": "Cricket adapter: antigravity",
+}
+
+
+class InstallError(SystemExit):
+    pass
+
+
+def classify(path: Path) -> str:
+    if not path.exists():
+        return "absent"
+    text = path.read_text()
+    for name, stamp in STAMP.items():
+        if stamp in text:
+            return name
+    return "foreign"
+
+
+def write_contract(dest: Path) -> None:
+    before = CORE.read_bytes()
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.is_symlink() or dest.exists():
+        dest.unlink()
+    shutil.copyfile(CORE, dest)
+    if CORE.read_bytes() != before:
+        raise InstallError("core/COMMANDS.md changed during copy; refusing to continue")
+    if dest.is_symlink() or not filecmp.cmp(dest, CORE, shallow=False):
+        raise InstallError(f"{dest} is not a regular copy of core/COMMANDS.md")
+
+
+def install(platform: str, target: Path) -> list[Path]:
+    if platform not in ADAPTERS:
+        raise InstallError(
+            f"unknown adapter {platform!r}. Expected cursor, codex, or antigravity."
+        )
+    target = target.resolve()
+    source = ROOT / "adapters" / platform / "skills"
+    dest_root = target / DEST[platform]
+    conflicts: list[str] = []
+    for name in COMMANDS:
+        kind = classify(dest_root / name / "SKILL.md")
+        if kind in ("absent", platform):
+            continue
+        path = dest_root / name / "SKILL.md"
+        if kind == "foreign":
+            conflicts.append(f"{path} is an existing skill without a Cricket adapter stamp")
+        else:
+            conflicts.append(f"{path} is a {kind} adapter install")
+    if conflicts:
+        shared = ""
+        if platform in ("codex", "antigravity"):
+            shared = (
+                "\nCodex and Antigravity both read .agents/skills, and this "
+                "checkout keeps its reference skills there too. One project "
+                "can hold one of those installs. This command will not "
+                "overwrite an unstamped skill or the other adapter."
+            )
+        raise InstallError(
+            "refusing to install "
+            + platform
+            + ":\n"
+            + "\n".join(conflicts)
+            + shared
+        )
+    written: list[Path] = []
+    for name in COMMANDS:
+        src = source / name
+        dst = dest_root / name
+        if dst.exists():
+            shutil.rmtree(dst)
+        shutil.copytree(src, dst, symlinks=True)
+        written.append(dst / "SKILL.md")
+    contract = dest_root / "cricket-contract" / "COMMANDS.md"
+    write_contract(contract)
+    written.append(contract)
+    return written
+
+
+def update(target: Path) -> list[Path]:
+    target = target.resolve()
+    updated: list[Path] = []
+    cursor_root = target / ".cursor/skills"
+    if classify(cursor_root / "pitch" / "SKILL.md") == "cursor":
+        path = cursor_root / "cricket-contract" / "COMMANDS.md"
+        write_contract(path)
+        updated.append(path)
+    agents_root = target / ".agents/skills"
+    agents_kind = classify(agents_root / "pitch" / "SKILL.md")
+    if agents_kind in ("codex", "antigravity"):
+        path = agents_root / "cricket-contract" / "COMMANDS.md"
+        write_contract(path)
+        updated.append(path)
+    if not updated:
+        raise InstallError(
+            "no Cricket adapter install in "
+            + str(target)
+            + ". Reference skills under .agents/skills are left untouched."
+        )
+    return updated
+
+
+def target_from(argv: list[str]) -> Path:
+    if "--target" not in argv:
+        return Path.cwd()
+    index = argv.index("--target")
+    if index + 1 >= len(argv):
+        raise InstallError("missing directory after --target")
+    return Path(argv[index + 1])
+
+
+def usage() -> str:
+    return """usage:
+  python3 cricket install cursor|codex|antigravity [--target DIR]
+  python3 cricket update [--target DIR]
+  python3 cricket test
+
+cursor writes .cursor/skills/<command>/SKILL.md and
+.cursor/skills/cricket-contract/COMMANDS.md.
+
+codex writes .agents/skills/<command>/SKILL.md,
+.agents/skills/<command>/agents/openai.yaml, and
+.agents/skills/cricket-contract/COMMANDS.md.
+
+antigravity writes .agents/skills/<command>/SKILL.md and
+.agents/skills/cricket-contract/COMMANDS.md.
+
+update replaces those COMMANDS.md copies from core/COMMANDS.md.
+It does not replace skill files and does not edit core/COMMANDS.md.
+"""
+
+
+def run_tests() -> int:
+    core_before = CORE.read_bytes()
+    failures: list[str] = []
+
+    def check(name: str, ok: bool, detail: str = "") -> None:
+        print(f"{'ok' if ok else 'FAIL':4} {name} {detail}")
+        if not ok:
+            failures.append(name)
+
+    with tempfile.TemporaryDirectory(prefix="cricket-install-") as tmp:
+        base = Path(tmp)
+
+        cursor_project = base / "cursor"
+        cursor_project.mkdir()
+        written = install("cursor", cursor_project)
+        cursor_skill = cursor_project / ".cursor/skills/pitch/SKILL.md"
+        cursor_contract = cursor_project / ".cursor/skills/cricket-contract/COMMANDS.md"
+        check("cursor-files", cursor_skill.is_file() and "Cricket adapter: cursor" in cursor_skill.read_text())
+        check("cursor-contract", cursor_contract.is_file() and not cursor_contract.is_symlink() and filecmp.cmp(cursor_contract, CORE, shallow=False))
+        check("cursor-leaves-agents", not (cursor_project / ".agents").exists())
+        again = install("cursor", cursor_project)
+        check("cursor-idempotent", [path.read_bytes() for path in written] == [path.read_bytes() for path in again])
+
+        canary = base / "canary.md"
+        canary.write_text("CANARY")
+        link_project = base / "link"
+        link_dest = link_project / ".cursor/skills/cricket-contract"
+        link_dest.mkdir(parents=True)
+        (link_dest / "COMMANDS.md").symlink_to(canary)
+        install("cursor", link_project)
+        check("symlink-canary-untouched", canary.read_text() == "CANARY")
+        installed = link_dest / "COMMANDS.md"
+        check("symlink-replaced", installed.is_file() and not installed.is_symlink() and filecmp.cmp(installed, CORE, shallow=False))
+
+        core_link = base / "core-link"
+        core_dest = core_link / ".agents/skills/cricket-contract"
+        core_dest.mkdir(parents=True)
+        (core_dest / "COMMANDS.md").symlink_to(CORE)
+        install("codex", core_link)
+        codex_contract = core_dest / "COMMANDS.md"
+        check("core-symlink-not-followed", CORE.read_bytes() == core_before and not codex_contract.is_symlink())
+
+        codex_project = base / "codex"
+        codex_project.mkdir()
+        install("codex", codex_project)
+        try:
+            install("antigravity", codex_project)
+            check("codex-blocks-antigravity", False, "install succeeded")
+        except InstallError as exc:
+            still = (codex_project / ".agents/skills/pitch/SKILL.md").read_text()
+            check("codex-blocks-antigravity", "Cricket adapter: codex" in still and "antigravity" in str(exc))
+
+        foreign = base / "foreign"
+        foreign_skill = foreign / ".agents/skills/pitch/SKILL.md"
+        foreign_skill.parent.mkdir(parents=True)
+        foreign_skill.write_text("# reference\n\nSolve only what was asked.\n")
+        before_foreign = foreign_skill.read_text()
+        try:
+            install("codex", foreign)
+            check("foreign-blocked", False, "install succeeded")
+        except InstallError:
+            check("foreign-blocked", foreign_skill.read_text() == before_foreign)
+        try:
+            update(foreign)
+            check("update-skips-reference", False, "update succeeded")
+        except InstallError:
+            check("update-skips-reference", foreign_skill.read_text() == before_foreign and not (foreign / ".agents/skills/cricket-contract").exists())
+
+        stale = cursor_contract.read_text()
+        cursor_contract.write_text("stale contract\n")
+        updated = update(cursor_project)
+        check("update-restores", filecmp.cmp(cursor_contract, CORE, shallow=False) and cursor_contract in updated and stale != "stale contract\n")
+
+        cli = subprocess.run(
+            [sys.executable, str(ROOT / "cricket"), "install", "antigravity", "--target", str(base / "anti")],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+        anti_skill = base / "anti" / ".agents/skills/pitch/SKILL.md"
+        check("cli-antigravity", cli.returncode == 0 and anti_skill.is_file() and "Cricket adapter: antigravity" in anti_skill.read_text(), cli.stderr.strip())
+
+        bad = subprocess.run(
+            [sys.executable, str(ROOT / "cricket"), "install", "nope", "--target", str(base / "nope")],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+        check("unknown-adapter", bad.returncode != 0 and "unknown adapter" in bad.stderr)
+
+    check("core-unchanged", CORE.read_bytes() == core_before)
+    if failures:
+        print("FAIL")
+        for item in failures:
+            print(f"- {item}")
+        return 1
+    print("PASS")
+    print("installer tests passed for cursor, codex, and antigravity")
+    return 0
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) < 2 or argv[1] in ("-h", "--help", "help"):
+        print(usage())
+        return 0 if len(argv) > 1 else 2
+    command = argv[1]
+    try:
+        if command == "test":
+            return run_tests()
+        if command == "install":
+            if len(argv) < 3:
+                raise InstallError(usage())
+            written = install(argv[2], target_from(argv))
+        elif command == "update":
+            written = update(target_from(argv))
+        else:
+            raise InstallError(usage())
+    except InstallError as exc:
+        print(exc, file=sys.stderr)
+        return 1
+    for path in written:
+        print(path)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

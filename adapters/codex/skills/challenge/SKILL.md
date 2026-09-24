@@ -7,6 +7,8 @@ description: "Cricket challenge. Explicit $challenge only. Follow the /challenge
 
 Codex wiring for Cricket `challenge`. This file does not define the behavior.
 
+Cricket adapter: codex
+
 Codex invokes this skill as `$challenge` or from the `/skills` picker. It does not register a `/challenge` slash command.
 
 Read `../cricket-contract/COMMANDS.md`. Follow only the section headed `/challenge` and the section headed `Cross-command invariants`. If that file is missing or unreadable, stop and say the Cricket contract is not installed.

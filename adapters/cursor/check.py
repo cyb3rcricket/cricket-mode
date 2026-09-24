@@ -79,6 +79,7 @@ def expected_body(name: str) -> str:
     return (
         f"\n# /{name}\n\n"
         f"Cursor wiring for Cricket `/{name}`. This file does not define the behavior.\n\n"
+        f"Cricket adapter: cursor\n\n"
         f"Read `../cricket-contract/COMMANDS.md`. Follow only the section headed "
         f"`/{name}` and the section headed `Cross-command invariants`. If that file "
         f"is missing or unreadable, stop and say the Cricket contract is not installed.\n\n"

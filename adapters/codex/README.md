@@ -30,7 +30,13 @@ On invoke, the skill tells Codex to read `.agents/skills/cricket-contract/COMMAN
 
 ## Install
 
-From a cricket-mode checkout, into the project that should grow the commands:
+From a cricket-mode checkout, into a project that is not this repository:
+
+```bash
+python3 cricket install codex --target /path/to/your/project
+```
+
+The same copy by hand:
 
 ```bash
 TARGET=/path/to/your/project
@@ -44,7 +50,7 @@ Remove the copied symlink before copying the contract. Copying onto that symlink
 
 You can copy one command's folder plus `cricket-contract/` if you only want that command.
 
-To pick up a newer contract, copy `core/COMMANDS.md` over `.agents/skills/cricket-contract/COMMANDS.md` again. The skill files stay as they are. Codex usually notices the change. If the new skill does not appear, restart Codex.
+To pick up a newer contract, run `python3 cricket update --target /path/to/your/project`, or copy `core/COMMANDS.md` over `.agents/skills/cricket-contract/COMMANDS.md` again. The skill files stay as they are. Codex usually notices the change. If the new skill does not appear, restart Codex.
 
 ## Usage
 
@@ -66,12 +72,12 @@ $scrub
 
 - Invocation is `$name` or the `/skills` picker. A `/pitch` slash command is not created. Cursor's `/pitch` spelling is a different host mechanism for the same contract section.
 - Codex turns implicit invocation on unless `agents/openai.yaml` sets `allow_implicit_invocation: false`. These skills set that. A copied skill without that file can run because the description matched.
-- This repository's `.agents/skills/` tree is the older reference copy. Codex loads it when you launch Codex here. Those files do not set `allow_implicit_invocation: false`, and they carry their own wording. Installing this adapter into that same tree overwrites them. Install it into the project where you want the contract-backed commands.
+- This repository's `.agents/skills/` tree is the older reference copy. Codex loads it when you launch Codex here. Those files do not set `allow_implicit_invocation: false`, and they carry their own wording. `python3 cricket install codex` refuses to replace an unstamped skill, including those reference files. Install it into the project where you want the contract-backed commands.
 - The copied tree includes a symlink at `cricket-contract/COMMANDS.md`. Remove it with `rm -f`, then `cp core/COMMANDS.md` onto that path. Leaving the symlink points at this repository's `core/COMMANDS.md`.
 - Codex does not grade the reply shape. `adapters/codex/check.py` installs the tree and then runs `conformance/check.py` on the shared reply fixtures. It does not ask Codex to write those replies.
 - Codex can shorten or omit skill descriptions when many skills are installed. These seven descriptions are one line each.
 - Two skills with the same name in different scopes both appear. Codex does not merge them.
-- This is not a one-command installer.
+- `python3 cricket install codex` writes only this adapter. Antigravity uses the same `.agents/skills` path, so the installer will not replace one with the other. `python3 cricket update` refreshes the installed contract copy and leaves the skill files in place.
 
 ## Check
 

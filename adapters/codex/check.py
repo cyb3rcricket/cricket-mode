@@ -67,6 +67,7 @@ def expected_body(name: str) -> str:
     return (
         f"\n# ${name}\n\n"
         f"Codex wiring for Cricket `{name}`. This file does not define the behavior.\n\n"
+        f"Cricket adapter: codex\n\n"
         f"Codex invokes this skill as `${name}` or from the `/skills` picker. "
         f"It does not register a `/{name}` slash command.\n\n"
         f"Read `../cricket-contract/COMMANDS.md`. Follow only the section headed "

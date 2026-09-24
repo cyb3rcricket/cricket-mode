@@ -18,6 +18,8 @@ The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are
 
 More adapters can be added later without changing the portable core.
 
+From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. See `docs/PORTABLE-CRICKET.md` for the files it writes and for the `.agents/skills` collision.
+
 ## Minimum bar for "implemented"
 
 Do not mark an adapter complete until:

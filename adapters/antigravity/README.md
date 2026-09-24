@@ -33,6 +33,12 @@ Rules are a different mechanism. A rule with `trigger: manual` loads only on an 
 From a cricket-mode checkout, into a project that is not this repository:
 
 ```bash
+python3 cricket install antigravity --target /path/to/your/project
+```
+
+The same copy by hand:
+
+```bash
 TARGET=/path/to/your/project
 mkdir -p "$TARGET/.agents/skills"
 cp -a adapters/antigravity/skills/. "$TARGET/.agents/skills/"
@@ -42,9 +48,9 @@ cp core/COMMANDS.md "$TARGET/.agents/skills/cricket-contract/COMMANDS.md"
 
 Remove the copied symlink before copying the contract. Copying onto that symlink can follow it and overwrite `core/COMMANDS.md`.
 
-Do not install this tree onto the cricket-mode repo's `.agents/skills/`. That directory is the reference implementation. Codex reads the same path, so one project can hold the Codex wrappers or these wrappers, not both.
+Do not install this tree onto the cricket-mode repo's `.agents/skills/`. That directory is the reference implementation. `python3 cricket install antigravity` refuses to replace an unstamped skill. Codex reads the same path, so one project can hold the Codex wrappers or these wrappers, not both.
 
-To pick up a newer contract, copy `core/COMMANDS.md` over `.agents/skills/cricket-contract/COMMANDS.md` again.
+To pick up a newer contract, run `python3 cricket update --target /path/to/your/project`, or copy `core/COMMANDS.md` over `.agents/skills/cricket-contract/COMMANDS.md` again.
 
 ## Usage
 
@@ -63,10 +69,10 @@ In the Antigravity prompt, the documented command is:
 ## Limitations
 
 - Autonomous activation is on. Antigravity's skill frontmatter documents `name` and `description` only. There is no documented switch corresponding to Cursor's `disable-model-invocation` or Codex's `allow_implicit_invocation: false`. These descriptions say to apply the skill only when the user types the slash command. Whether Antigravity obeys that is not something this repository can prove.
-- `.agents/skills` is shared with Codex and with this repo's reference skills. Installing here overwrites whatever skill folder has the same name.
+- `.agents/skills` is shared with Codex and with this repo's reference skills. The installer refuses that overwrite. A hand copy still replaces a same-named skill folder.
 - Legacy `.agent/skills` is still scanned. This adapter does not write it. A project that also has `.agent/skills/<name>` can load a second copy.
 - Antigravity does not grade the reply shape. `adapters/antigravity/check.py` installs the tree and runs `conformance/check.py`. It does not open Antigravity.
-- This is not a one-command installer.
+- `python3 cricket install antigravity` writes only this adapter. `python3 cricket update` refreshes the installed contract copy and leaves the skill files in place.
 
 ## REQUIRES LIVE ANTIGRAVITY VALIDATION
 

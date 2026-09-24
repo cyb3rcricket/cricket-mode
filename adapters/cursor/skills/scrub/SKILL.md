@@ -8,6 +8,8 @@ disable-model-invocation: true
 
 Cursor wiring for Cricket `/scrub`. This file does not define the behavior.
 
+Cricket adapter: cursor
+
 Read `../cricket-contract/COMMANDS.md`. Follow only the section headed `/scrub` and the section headed `Cross-command invariants`. If that file is missing or unreadable, stop and say the Cricket contract is not installed.
 
 Do not invent a different purpose, scope boundary, evidence requirement, or result shape.

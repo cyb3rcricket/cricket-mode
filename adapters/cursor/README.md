@@ -28,7 +28,13 @@ On invoke, the skill tells the agent to read `.cursor/skills/cricket-contract/CO
 
 ## Install
 
-From a cricket-mode checkout, into the project that should grow the commands:
+From a cricket-mode checkout:
+
+```bash
+python3 cricket install cursor --target /path/to/your/project
+```
+
+The same copy by hand:
 
 ```bash
 TARGET=/path/to/your/project
@@ -44,7 +50,7 @@ Install at the project root `.cursor/skills/`. A `.cursor/skills/` directory nes
 
 You can copy one command's folder plus `cricket-contract/` if you only want that command. The contract folder has no `SKILL.md`, so Cursor does not treat it as an eighth command.
 
-To pick up a newer contract, copy `core/COMMANDS.md` over `.cursor/skills/cricket-contract/COMMANDS.md` again. The seven skill files stay as they are.
+To pick up a newer contract, run `python3 cricket update --target /path/to/your/project`, or copy `core/COMMANDS.md` over `.cursor/skills/cricket-contract/COMMANDS.md` again. The seven skill files stay as they are.
 
 ## Usage
 
@@ -67,7 +73,7 @@ The commands stay independent. Invoking one does not invoke the others.
 - Cursor will not reject a reply that skips the contract's result shape. The skill instructs the agent. `adapters/cursor/check.py` does not grade a reply. `conformance/check.py` can grade a reply string against the shared cases.
 - `.agents/skills/` in this repository is the older reference copy. Cursor loads it too. Those files do not set `disable-model-invocation`, and they carry their own wording. Installing this adapter into the cricket-mode repo can expose two skills with the same name. Install it into the project where you want the contract-backed commands.
 - The copied tree includes a symlink at `cricket-contract/COMMANDS.md`. Remove it with `rm -f`, then `cp core/COMMANDS.md` onto that path. Leaving the symlink points at this repository's `core/COMMANDS.md`. Outside that layout the read fails, and the skill stops instead of inventing a behavior.
-- This is not a one-command installer. Re-copy the contract file when it changes.
+- `python3 cricket install cursor` writes only this adapter. `python3 cricket update` refreshes the installed contract copy and leaves the seven skill files in place.
 - Legacy `.cursor/commands/*.md` files are not this adapter. Cursor's current mechanism for this kind of explicit command is a skill with `disable-model-invocation: true`.
 
 ## Check
