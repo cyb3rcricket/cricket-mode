@@ -88,7 +88,7 @@ Do not assume these exist:
 - Jev integration,
 - autonomous retry loops.
 
-The seven behaviors have adapters, an installer, and recorded live sessions. Phase 6 has not been started.
+The seven behaviors have adapters, an installer, and recorded live sessions. `orchestration/` is an optional policy beside those commands. It does not route models, and it does not retry on its own.
 
 ## Implementation plan
 
@@ -146,9 +146,11 @@ Codex and Antigravity both use `.agents/skills`. This repository keeps its refer
 
 ### Phase 6 — optional orchestration
 
-After portability works, separately explore model routing, deterministic verification loops, retry/escalation, or other higher-level orchestration.
+`orchestration/policy.py` is a pure function. A task dict goes in. A result dict comes out. `model` is always null. The caller passes `attempt`. `max_attempts` is 2. There is no loop inside `decide`.
 
-Those should sit above or beside Cricket commands rather than silently redefining them.
+Recommendations may name `prove-it`, `challenge`, or `drift`, and at most two of them. Nothing is invoked. `pitch`, `chirp`, `senpai`, and `scrub` stay explicit. The installer still copies only the seven commands. `core/COMMANDS.md` does not mention lanes.
+
+Known limits, left in place: the caller must increment `attempt`; the words `session` and `architecture` mark a lane `DEEP`; blast radius needs `expected_files`; exactly twice the expected count does not escalate; `COMPLETE` with `verified_completion: false` is not a passed test; this layer has not been run inside a host.
 
 ## Guardrails for Future Us
 
@@ -181,13 +183,13 @@ Portable v1 is complete.
 - **DONE** — platform limitations documented in each adapter README, including the Antigravity `/pitch` observation.
 - **DONE** — README does not call the adapters scaffolds.
 
-Phase 6 has not been started.
+Phase 6 policy is in `orchestration/`. Model routing, autonomous loops, and Phase 7 are not started.
 
 ## If we get sidetracked, resume here
 
-Portable v1 is complete. Do not start Phase 6 from this closeout.
+Portable v1 is complete. The optional policy is in `orchestration/`. Do not start Phase 7 from this reconstruction.
 
-Leave model routing and the other Phase 6 ideas alone.
+Next action is one real task through `decide` with that project's check results, to see whether `session` or `architecture` over-calls `DEEP`. Do not add a rule before that.
 
 The central question is:
 

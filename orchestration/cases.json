@@ -1,0 +1,287 @@
+[
+  {
+    "name": "tiny-change",
+    "task": {
+      "summary": "Fix a typo in the readme",
+      "expected_files": 1,
+      "changed_files": ["README.md"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "NOT RELEVANT"}]
+    },
+    "expect": {
+      "lane": "FAST",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": false,
+      "unresolved_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "normal-feature",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 3,
+      "changed_files": ["a.py", "b.py", "test_b.py"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "PASSED"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "fail-attempt-1",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 3,
+      "changed_files": ["a.py", "b.py", "test_b.py"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "FAILED"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "RETRY",
+      "model": null,
+      "verified_completion": false,
+      "unresolved_failures": ["pytest"],
+      "recommendations": ["prove-it"],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "fail-then-pass",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 3,
+      "changed_files": ["a.py", "b.py", "test_b.py"],
+      "attempt": 2,
+      "checks": [{"name": "pytest", "status": "PASSED"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "fail-attempt-2",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 3,
+      "changed_files": ["a.py", "b.py", "test_b.py"],
+      "attempt": 2,
+      "checks": [{"name": "pytest", "status": "FAILED"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "ESCALATE",
+      "model": null,
+      "verified_completion": false,
+      "unresolved_failures": ["pytest"],
+      "recommendations": ["challenge"],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "fail-attempt-3",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 3,
+      "changed_files": ["a.py", "b.py", "test_b.py"],
+      "attempt": 3,
+      "checks": [{"name": "pytest", "status": "FAILED"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "ESCALATE",
+      "model": null,
+      "verified_completion": false,
+      "unresolved_failures": ["pytest"],
+      "recommendations": ["challenge"],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "blast-radius",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 2,
+      "changed_files": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "PASSED"}]
+    },
+    "expect": {
+      "lane": "ESCALATE",
+      "decision": "ESCALATE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "recommendations": ["drift"],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "exactly-twice",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 2,
+      "changed_files": ["a.py", "b.py", "c.py", "d.py"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "PASSED"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "auth-not-run",
+    "task": {
+      "summary": "Rotate the auth token helper",
+      "expected_files": 2,
+      "changed_files": ["auth.py", "test_auth.py"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "NOT RUN"}]
+    },
+    "expect": {
+      "lane": "DEEP",
+      "decision": "BLOCKED",
+      "model": null,
+      "verified_completion": false,
+      "unresolved_failures": [],
+      "recommendations": ["prove-it", "challenge"],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "auth-passed",
+    "task": {
+      "summary": "Rotate the auth token helper",
+      "expected_files": 2,
+      "changed_files": ["auth.py", "test_auth.py"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "PASSED"}]
+    },
+    "expect": {
+      "lane": "DEEP",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "recommendations": ["challenge"],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "missing-run",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 3,
+      "changed_files": ["a.py", "b.py", "test_b.py"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "NOT RUN"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "BLOCKED",
+      "model": null,
+      "verified_completion": false,
+      "unresolved_failures": [],
+      "recommendations": ["prove-it"],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "already-proven",
+    "task": {
+      "summary": "Document the quest search that already passed",
+      "expected_files": 2,
+      "changed_files": ["README.md", "docs/notes.md"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "PASSED"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "tool-unavailable",
+    "task": {
+      "summary": "Add a name search for quests",
+      "expected_files": 3,
+      "changed_files": ["a.py", "b.py", "test_b.py"],
+      "attempt": 1,
+      "checks": [{"name": "browser", "status": "NOT AVAILABLE"}]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": false,
+      "unresolved_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "author-not-auth",
+    "task": {
+      "summary": "Update the author byline",
+      "expected_files": 1,
+      "changed_files": ["README.md"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "NOT RELEVANT"}]
+    },
+    "expect": {
+      "lane": "FAST",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": false,
+      "unresolved_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
+    }
+  },
+  {
+    "name": "session-word",
+    "task": {
+      "summary": "Rename the session helper",
+      "expected_files": 2,
+      "changed_files": ["session.py", "test_session.py"],
+      "attempt": 1,
+      "checks": [{"name": "pytest", "status": "PASSED"}]
+    },
+    "expect": {
+      "lane": "DEEP",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "recommendations": ["challenge"],
+      "max_attempts": 2
+    }
+  }
+]

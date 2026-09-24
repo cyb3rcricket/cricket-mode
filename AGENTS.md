@@ -10,6 +10,7 @@ Preserve the distinction between **core behavior** and **platform adapters**.
 - `.agents/skills/` contains the current working reference implementations.
 - `adapters/` contains platform-specific glue.
 - `docs/PORTABLE-CRICKET.md` is the architecture and continuation plan.
+- `orchestration/` is an optional policy beside the commands. Portable v1 does not require it.
 
 Do not make a platform-specific behavior part of the core unless it is genuinely required for the command's meaning.
 
@@ -39,4 +40,4 @@ If a platform cannot support a behavior exactly, document the limitation instead
 
 Cricket Mode is not a mandatory agent framework.
 
-Do not add routers, model selection, autonomous loops, or new orchestration merely because they are possible. Those can be explored later as optional layers if real use proves they are valuable.
+`orchestration/policy.py` is the optional Phase 6 policy. It recommends a lane and, at most, existing Cricket commands. It does not select a model, run tests, or invoke those commands. Do not turn it into a router or an autonomous loop unless a later phase says so.
