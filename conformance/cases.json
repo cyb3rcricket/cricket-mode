@@ -1,0 +1,223 @@
+[
+  {
+    "command": "pitch",
+    "fixture": "Rename loadUser to loadAccount in account.js. Only that.",
+    "wont_do": ["helper module", "retry wrapper"],
+    "forbidden": ["retryWrapper"],
+    "samples": [
+      {
+        "name": "pass",
+        "fail": [],
+        "reply": "**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file.\n\n**Won't do:** helper module, retry wrapper.\n"
+      },
+      {
+        "name": "missing-wont",
+        "fail": ["pitch.labels", "pitch.scope"],
+        "reply": "**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file.\n"
+      },
+      {
+        "name": "code-before-pitch",
+        "fail": ["pitch.before"],
+        "reply": "```js\nfunction loadAccount() {}\n```\n\n**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file.\n\n**Won't do:** helper module, retry wrapper.\n"
+      },
+      {
+        "name": "omits-a-non-goal",
+        "fail": ["pitch.scope"],
+        "reply": "**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file.\n\n**Won't do:** helper module.\n"
+      },
+      {
+        "name": "does-the-extra-work",
+        "fail": ["pitch.no_widen"],
+        "reply": "**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file.\n\n**Won't do:** helper module, retry wrapper.\n\n```js\nfunction retryWrapper() { return loadAccount() }\n```\n"
+      },
+      {
+        "name": "implements-before-pitch",
+        "fail": ["pitch.before"],
+        "reply": "I added retryWrapper in account.js.\n\n**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file.\n\n**Won't do:** helper module, retry wrapper.\n"
+      },
+      {
+        "name": "prose-widen",
+        "fail": ["pitch.no_widen"],
+        "reply": "**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file.\n\n**Won't do:** helper module, retry wrapper.\n\nI also added retryWrapper.\n"
+      }
+    ]
+  },
+  {
+    "command": "chirp",
+    "fixture": "Restate the previous reply.",
+    "previous": "The close control is a descendant of a stacking context created by the promo bar. The bar is position sticky, and the slide-in applies a transform. A transformed element forms a containing stacking context, so the modal z-index never competes with the scrim. Hit-testing resolves to the scrim. Remove the transform from the bar, or portal the modal to a node directly under document.body.",
+    "keep": ["transform", "document.body"],
+    "drop": ["stacking context"],
+    "samples": [
+      {
+        "name": "pass",
+        "fail": [],
+        "reply": "The close button is fine. A transform on the promo bar puts the modal in its own layer, under the backdrop. Remove that transform, or render the modal under document.body.\n\n**Basically:** A transform on the promo bar traps the modal under the backdrop."
+      },
+      {
+        "name": "still-the-long-reply",
+        "fail": ["chirp.shorter", "chirp.basically", "chirp.drops"],
+        "reply": "The close control is a descendant of a stacking context created by the promo bar. The bar is position sticky, and the slide-in applies a transform. A transformed element forms a containing stacking context, so the modal z-index never competes with the scrim. Hit-testing resolves to the scrim. Remove the transform from the bar, or portal the modal to a node directly under document.body."
+      },
+      {
+        "name": "short-but-no-basically",
+        "fail": ["chirp.basically"],
+        "reply": "A transform on the promo bar traps the modal. Remove it, or render the modal under document.body."
+      },
+      {
+        "name": "drops-a-fix",
+        "fail": ["chirp.keeps"],
+        "reply": "The backdrop is on top of the modal.\n\n**Basically:** The backdrop is covering the modal."
+      },
+      {
+        "name": "keeps-the-jargon",
+        "fail": ["chirp.drops"],
+        "reply": "The promo bar's transform creates a stacking context, so the modal stays under the backdrop. Remove the transform, or use document.body.\n\n**Basically:** The stacking context traps the modal under the backdrop."
+      },
+      {
+        "name": "extra-paragraph",
+        "fail": ["chirp.basically"],
+        "reply": "Remove the transform, or render the modal under document.body.\n\n**Basically:** The transform traps the modal.\n\nHere is a new paragraph about browser history."
+      }
+    ]
+  },
+  {
+    "command": "senpai",
+    "fixture": "GET /orders used OFFSET and timed out on deep pages. It already sorts by id descending. The change uses a cursor.",
+    "mechanism": ["start after the last id"],
+    "pattern": "remember the last row",
+    "stays": "null when the page is finished",
+    "changes": "which column is packed into the cursor",
+    "samples": [
+      {
+        "name": "pass",
+        "fail": [],
+        "reply": "The list no longer skips rows. It says start after the last id.\n\nOFFSET walks rows and throws them away. A cursor names the last order and reads only later ones.\n\nNext time, remember the last row, then ask for rows after it, and use null when the page is finished. What changes is which column is packed into the cursor.\n"
+      },
+      {
+        "name": "syntax-only",
+        "fail": ["senpai.mechanism", "senpai.pattern", "senpai.stays", "senpai.changes"],
+        "reply": "Done. GET /orders now takes cursor instead of offset. The response includes next_cursor.\n"
+      },
+      {
+        "name": "no-pattern",
+        "fail": ["senpai.pattern"],
+        "reply": "The list says start after the last id. Use null when the page is finished. What changes is which column is packed into the cursor.\n"
+      },
+      {
+        "name": "no-stays-versus-changes",
+        "fail": ["senpai.stays", "senpai.changes"],
+        "reply": "The list says start after the last id. Next time, remember the last row.\n"
+      }
+    ]
+  },
+  {
+    "command": "challenge",
+    "fixture": "pay() marks an invoice paid with req.body.amount and emails a receipt. The user did not ask for a fix. The auth wrapper is outside the diff.",
+    "findings": ["client amount", "second call"],
+    "not_findings": ["auth wrapper"],
+    "fix_markers": ["function payFixed"],
+    "samples": [
+      {
+        "name": "pass",
+        "fail": [],
+        "reply": "A second call hits markPaid again. The handler passes the client amount. I did not inspect the auth wrapper, so that is not a finding.\n\n**Findings:** The client amount is used instead of the invoice amount. A second call sends another receipt.\n\n**Looks solid:** The id written comes from getInvoice, not from the body.\n"
+      },
+      {
+        "name": "possibility-as-finding",
+        "fail": ["challenge.possibility"],
+        "reply": "**Findings:** The client amount is used. A second call sends another receipt. The auth wrapper is missing.\n\n**Looks solid:** The id written comes from getInvoice.\n"
+      },
+      {
+        "name": "no-close",
+        "fail": ["challenge.closes", "challenge.confirmed"],
+        "reply": "The client amount is used. A second call sends another receipt. The auth wrapper was not inspected.\n"
+      },
+      {
+        "name": "rewrites-the-handler",
+        "fail": ["challenge.no_fix"],
+        "reply": "The client amount is used. A second call sends another receipt. The auth wrapper was not inspected.\n\n**Findings:** The client amount is used. A second call sends another receipt.\n\n**Looks solid:** The id comes from getInvoice.\n\nfunction payFixed(req) { return db.markPaid(req.params.id) }\n"
+      }
+    ]
+  },
+  {
+    "command": "prove-it",
+    "fixture": "Empty q on GET /customers used to return every row. The change returns an empty list.",
+    "status": "PASS",
+    "evidence": ["customers.search.test.js", "curl"],
+    "samples": [
+      {
+        "name": "pass",
+        "fail": [],
+        "reply": "npm test -- customers.search.test.js\nblank q returns no rows\n\ncurl -s \"http://localhost:3000/customers?q=\"\n[]\n\n**PASS** — empty q returns [] in customers.search.test.js and from curl.\n"
+      },
+      {
+        "name": "read-the-code",
+        "fail": ["proveit.evidence"],
+        "reply": "I read the handler. It trims q and returns an empty list. That looks correct.\n\n**PASS** — the handler returns an empty list.\n"
+      },
+      {
+        "name": "two-statuses",
+        "fail": ["proveit.status"],
+        "reply": "npm test -- customers.search.test.js\ncurl -s \"http://localhost:3000/customers?q=\"\n[]\n\n**PASS** — empty q returns [].\n**PARTIAL** — the whitespace case was not run.\n"
+      },
+      {
+        "name": "evidence-without-status",
+        "fail": ["proveit.status"],
+        "reply": "npm test -- customers.search.test.js\ncurl -s \"http://localhost:3000/customers?q=\"\n[]\n"
+      },
+      {
+        "name": "status-not-last",
+        "fail": ["proveit.status"],
+        "reply": "npm test -- customers.search.test.js\ncurl -s \"http://localhost:3000/customers?q=\"\n[]\n\n**PASS** — empty q returns [].\n\nI would also refactor the router.\n"
+      }
+    ]
+  },
+  {
+    "command": "drift",
+    "fixture": "Notifications worker. README, config, and consumer may disagree about retries.",
+    "sides": ["retried 5 times", "max_retries = 3"],
+    "samples": [
+      {
+        "name": "pass",
+        "fail": [],
+        "reply": "README.md says a failed send is retried 5 times. config/worker.toml sets max_retries = 3, and the worker reads that field. Current behavior is 3. I did not change either file.\n"
+      },
+      {
+        "name": "stale-file-list",
+        "fail": ["drift.sides"],
+        "reply": "README.md and config/worker.toml both talk about retries. The docs may be stale. A docs pass would help.\n"
+      }
+    ]
+  },
+  {
+    "command": "scrub",
+    "fixture": "Recent edit to src/count.js. A comment restates the increment. A null customer crash and a README retry count are also nearby.",
+    "path": "src/count.js",
+    "snippet": "// increment the counter",
+    "redesign": "class hierarchy",
+    "out_of_scope": ["null customer", "README says 5 retries"],
+    "samples": [
+      {
+        "name": "pass",
+        "fail": [],
+        "reply": "**Residue:** src/count.js has `// increment the counter` above the increment. Delete that comment.\n\n**Keep:** the increment itself.\n\n**Out of scope:** null customer belongs to /challenge. README says 5 retries belongs to /drift.\n"
+      },
+      {
+        "name": "redesign",
+        "fail": ["scrub.surgical", "scrub.no_redesign"],
+        "reply": "**Residue:** src/count.js has `// increment the counter`. Replace the file with a class hierarchy.\n\n**Keep:** the increment itself.\n\n**Out of scope:** null customer belongs to /challenge. README says 5 retries belongs to /drift.\n"
+      },
+      {
+        "name": "bug-in-residue",
+        "fail": ["scrub.separated"],
+        "reply": "**Residue:** src/count.js has `// increment the counter`. Delete that comment. Also the null customer crash should be fixed here.\n\n**Keep:** the increment itself.\n\n**Out of scope:** README says 5 retries belongs to /drift.\n"
+      },
+      {
+        "name": "no-close",
+        "fail": ["scrub.closes", "scrub.concrete", "scrub.surgical", "scrub.separated"],
+        "reply": "src/count.js has a comment that restates the increment. I would leave the crash alone.\n"
+      }
+    ]
+  }
+]

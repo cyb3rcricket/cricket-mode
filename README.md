@@ -36,7 +36,7 @@ Cricket Mode gives each moment a small, explicit command.
 
 ## Portable by design
 
-Cricket Mode is being separated into two layers:
+Cricket Mode is split into two layers:
 
 1. **Core behavior** — what each command means regardless of model, editor, or coding agent.
 2. **Adapters** — thin platform-specific glue for Codex, Cursor, Antigravity, and future environments.
@@ -54,7 +54,7 @@ The goal is **behavioral portability, not identical plumbing**.
        adapter         adapter        adapter
 ```
 
-The existing `.agents/skills/` directory remains the current working reference implementation while the portable layer is built.
+The `.agents/skills/` directory remains the reference implementation. Portable adapters are in `adapters/`.
 
 See **[Portable Cricket](docs/PORTABLE-CRICKET.md)** for the architecture, current status, and exact continuation plan. It is intentionally written so the project can be resumed after a long break without reconstructing the idea from chat history.
 
@@ -68,11 +68,13 @@ cricket-mode/
 │   └── COMMANDS.md           # platform-neutral behavior contract
 ├── adapters/
 │   ├── README.md             # adapter contract
-│   ├── codex/README.md
-│   ├── cursor/README.md
-│   └── antigravity/README.md
+│   ├── codex/                # Codex skills invoked as $name
+│   ├── cursor/               # Cursor skills wired to core/COMMANDS.md
+│   └── antigravity/          # Antigravity skills invoked as /name
+├── conformance/              # shared reply checks for the seven commands
 ├── docs/
 │   └── PORTABLE-CRICKET.md   # architecture + resume plan
+├── cricket                   # install or update one adapter
 ├── AGENTS.md
 └── examples/
 ```
@@ -83,11 +85,11 @@ The currently working reference skills live in `.agents/skills/`.
 
 Copy any skill you want into an agent environment that supports the current skill format. You can install only the skills you want.
 
-**Important:** the Codex, Cursor, and Antigravity adapter directories are currently scaffolds, not finished installers. Cross-agent installation is the next phase.
+**Important:** Portable v1 is complete. From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. `python3 cricket update --target /path/to/project` refreshes an installed contract copy. Install notes and the live-session records are in each adapter README. Shared reply checks are in `conformance/`. The adapter scripts still do not open the host applications. The live sessions are recorded separately below.
 
 ## Usage
 
-When the installed environment exposes the behaviors, invoke the relevant command:
+Cursor and the Antigravity docs use a slash command. Codex uses `$name` or the `/skills` picker. The section headings in `core/COMMANDS.md` stay `/pitch` and the rest either way.
 
 ```text
 /chirp
@@ -98,6 +100,8 @@ When the installed environment exposes the behaviors, invoke the relevant comman
 /scrub
 /pitch
 ```
+
+Codex spelling: `$chirp`, `$senpai`, `$challenge`, `$prove-it`, `$drift`, `$scrub`, `$pitch`.
 
 The commands are intentionally small. They change how an agent approaches one moment; they are not a mandatory workflow framework.
 
@@ -126,17 +130,23 @@ Add complexity only when real use proves it is needed.
 
 ## Status
 
-Cricket Mode is early and experimental.
+Three labels are kept apart:
+
+- **IMPLEMENTED** — the files exist in this repository.
+- **DETERMINISTICALLY VERIFIED** — a script in this repository exercised that behavior. The script does not open the host application.
+- **LIVE VALIDATED** — the named host was run, and the session matched the notes below.
+
+Portable v1 is complete. Phase 6 has not been started.
 
 | Piece | Status |
 | --- | --- |
-| Seven current skills | Working reference implementation |
-| Platform-neutral command contract | Scaffolded |
-| Portable architecture documentation | Scaffolded |
-| Codex adapter | Planned / scaffold only |
-| Cursor adapter | Planned / scaffold only |
-| Antigravity adapter | Planned / scaffold only |
-| One-command installer | Planned |
+| Seven reference skills | IMPLEMENTED in `.agents/skills/` |
+| Command contract | IMPLEMENTED. Reviewed against the reference skills and the existing examples |
+| Codex adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/codex/check.py`. LIVE VALIDATED: `$pitch` loaded the skill and contract, stated Ask / Smallest plan / Won't do before editing, a normal prompt did not auto-trigger Cricket, and `$prove-it` verified the filesystem and ended **PASS** |
+| Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py`. LIVE VALIDATED: `/pitch` loaded the skill and contract, stated Ask / Smallest plan / Won't do before editing, a normal prompt did not auto-trigger the skill, and `/prove-it` verified execution and files and ended **PASS** |
+| Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py`. LIVE VALIDATED: `/pitch` loaded the installed skill and contract, stated Ask / Smallest plan / Won't do, and wrote the requested file. A normal prompt did not invoke any Cricket skill. `/prove-it` verified filesystem, content, and bytes and ended **PASS**. That `/pitch` run also surfaced `challenge` as a used skill |
+| Shared conformance checks | DETERMINISTICALLY VERIFIED by `python3 conformance/check.py` and by each adapter check |
+| Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test`. Install and update tooling is complete |
 
 ## License
 

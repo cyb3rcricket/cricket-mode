@@ -8,15 +8,17 @@ An adapter may handle where instructions live, how commands are discovered/invok
 
 An adapter may **not** quietly change the meaning of a command.
 
-The behavioral source of truth is `../core/COMMANDS.md`.
+The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are `../conformance/`. The Cursor, Codex, and Antigravity checks call that module.
 
 ## Current targets
 
-- `codex/`
-- `cursor/`
-- `antigravity/`
+- `codex/` — implemented. Deterministic check passes. LIVE VALIDATED for `$pitch` and `$prove-it`
+- `cursor/` — implemented. Deterministic check passes. LIVE VALIDATED for `/pitch` and `/prove-it`
+- `antigravity/` — implemented. Deterministic check passes. LIVE VALIDATED for `/pitch` and `/prove-it`. One `/pitch` run also surfaced `challenge`
 
 More adapters can be added later without changing the portable core.
+
+From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. See `docs/PORTABLE-CRICKET.md` for the files it writes and for the `.agents/skills` collision.
 
 ## Minimum bar for "implemented"
 

@@ -64,71 +64,85 @@ Should we retry?       → agent judgment may help
 
 ### Working reference implementation
 
-`.agents/skills/` contains the seven current skills. These are the behavior already being tested. Do not throw them away while building portability.
+`.agents/skills/` contains the seven reference skills. They stay in place. `python3 cricket` will not overwrite them.
 
 ### Portable contract
 
-`core/COMMANDS.md` is the new neutral specification for what the seven commands mean.
+`core/COMMANDS.md` is the neutral specification for what the seven commands mean. It has been reviewed against `.agents/skills/` and the transcripts in `examples/`.
 
-### Adapter skeleton
+### Adapters
 
-`adapters/codex/`, `adapters/cursor/`, and `adapters/antigravity/` are **implementation placeholders**, not finished support.
+`adapters/cursor/`, `adapters/codex/`, and `adapters/antigravity/` expose the seven commands through each host's skill mechanism. All three read `core/COMMANDS.md`. The adapter checks do not open the hosts. Live sessions for Cursor, Codex, and Antigravity are recorded below. Portable v1 is complete.
+
+### Conformance
+
+`conformance/` checks a reply against one shared case per command. The Cursor, Codex, and Antigravity checks call it. The conformance checker does not call a model.
 
 ## Deliberately not built yet
 
-Do not assume these exist just because the scaffold exists:
+Do not assume these exist:
 
-- automatic Codex installation,
-- automatic Cursor installation,
-- automatic Antigravity installation,
 - a universal command registry,
-- a one-command installer,
-- adapter conformance tests,
 - model routing,
 - Luna/Sol escalation,
 - Jev integration,
 - autonomous retry loops.
 
-First make the existing seven behaviors portable. Then decide which orchestration ideas have earned their complexity.
+The seven behaviors have adapters, an installer, and recorded live sessions. Phase 6 has not been started.
 
 ## Implementation plan
 
-### Phase 1 — confirm the contract
+### Phase 1 — confirm the contract (done)
 
-Review `core/COMMANDS.md` against the existing skill files and examples. Make sure the neutral wording preserves the behavior already wanted.
+Reviewed `core/COMMANDS.md` against `.agents/skills/*/SKILL.md` and the transcripts in `examples/`. The contract now keeps the behaviors those sources already require, including the pitch stated before edits, chirp restating the previous reply, senpai teaching the mechanism, challenge separating findings from uninspected code, prove-it running the real behavior, and scrub closing with Residue, Keep, and Out of scope.
 
-### Phase 2 — build one adapter end to end
+`examples/` has transcripts for `/chirp`, `/senpai`, `/challenge`, `/prove-it`, and `/drift`. `/pitch` and `/scrub` were checked against their skill files only. The reference skills were not rewritten.
 
-Pick **one** environment. Do not build all three simultaneously.
+### Phase 2 — build one adapter end to end (done)
 
-Deliver: installation instructions, seven exposed behaviors, and no semantic fork from the core.
+Chose Cursor. The other adapters were left for later.
 
-### Phase 3 — conformance tests
+`adapters/cursor/` exposes all seven commands as Cursor Agent Skills. Each `SKILL.md` is wiring: it points at one shared contract file. In this repository that file is a symlink to `core/COMMANDS.md`. Install steps, invocation, and limitations are in `adapters/cursor/README.md`. `adapters/cursor/check.py` installs that tree into a temporary project's `.cursor/skills/`, checks discovery plus the contract copy, and then runs `conformance/check.py`. That script does not open Cursor. The live session is recorded under Live sessions.
 
-Create a small shared behavior matrix.
+### Phase 3 — conformance tests (done)
 
-Examples:
-- Did `/pitch` state non-goals before implementation?
-- Did `/challenge` separate findings from possibilities?
-- Did `/prove-it` execute behavior instead of merely reading code?
-- Did `/scrub` avoid becoming a redesign?
+`conformance/` is the shared behavior matrix. One case per command supplies the fixture. `conformance/check.py` encodes the contract checks once. `python3 conformance/check.py` scores the bundled pass and fail replies. A later adapter imports `evaluate` instead of copying the rules. The checker does not call a model. The Cursor, Codex, and Antigravity adapter checks run this suite. None of them opens the host application.
 
 ### Phase 4 — second and third adapters
 
-Use the first working adapter to define the repeatable adapter pattern, then implement the others.
+**Codex (done).** `adapters/codex/` exposes the seven commands as Codex skills invoked with `$name`, not as `/name` slash commands. Each skill points at one shared contract file. `agents/openai.yaml` sets `allow_implicit_invocation: false`. Install steps and limitations are in `adapters/codex/README.md`. `adapters/codex/check.py` installs that tree into a temporary project's `.agents/skills/` and runs `conformance/check.py`. That script does not open Codex. The live session is recorded under Live sessions.
 
-### Phase 5 — installation/update tooling
+**Antigravity (done).** `adapters/antigravity/` exposes the seven commands as Antigravity skills. The documented invoke is `/name`. Official skill frontmatter has no switch that disables autonomous activation. `adapters/antigravity/check.py` installs the tree and runs `conformance/check.py`. That script does not open Antigravity. The live session, including one `/pitch` run that also surfaced `challenge`, is recorded under Live sessions and in `adapters/antigravity/README.md`.
 
-Only after adapters work, consider a tiny installer such as:
+### Phase 5 — installation/update tooling (done)
+
+`python3 cricket` copies one adapter out of this checkout. It is not a package manager. The contract bytes always come from `core/COMMANDS.md`. The script never writes that file.
 
 ```text
-cricket install codex
-cricket install cursor
-cricket install antigravity
-cricket update
+python3 cricket install cursor --target /path/to/project
+python3 cricket install codex --target /path/to/project
+python3 cricket install antigravity --target /path/to/project
+python3 cricket update --target /path/to/project
+python3 cricket test
 ```
 
-Do not build a package manager unless reality demands one.
+`--target` defaults to the current directory. The command is `python3 cricket` because the script has no install step of its own.
+
+| Adapter | Files created or replaced |
+| --- | --- |
+| cursor | `.cursor/skills/<command>/SKILL.md` and `.cursor/skills/cricket-contract/COMMANDS.md` |
+| codex | `.agents/skills/<command>/SKILL.md`, `.agents/skills/<command>/agents/openai.yaml`, and `.agents/skills/cricket-contract/COMMANDS.md` |
+| antigravity | `.agents/skills/<command>/SKILL.md` and `.agents/skills/cricket-contract/COMMANDS.md` |
+
+`<command>` is `pitch`, `chirp`, `senpai`, `challenge`, `prove-it`, `drift`, and `scrub`. Each installed `SKILL.md` contains the line `Cricket adapter: cursor`, `Cricket adapter: codex`, or `Cricket adapter: antigravity`. That line is how the script tells an adapter install from a reference skill.
+
+`update` replaces an installed `cricket-contract/COMMANDS.md` from `core/COMMANDS.md` when `pitch/SKILL.md` carries one of those lines. It does not replace skill files.
+
+A repeat install of the same adapter replaces that adapter's skill folders and writes the contract again. If `COMMANDS.md` is a symlink, the script unlinks it and writes a regular file. It does not copy through the link.
+
+Codex and Antigravity both use `.agents/skills`. This repository keeps its reference skills in that same directory. Those reference files are not stamped, and Codex and Antigravity stamps are different. The installer refuses the install when any of the seven skill paths is unstamped or stamped for the other host, and it writes nothing. It does not merge the two adapters, and it does not overwrite the reference skills. Install Codex or Antigravity into another project. Cursor writes `.cursor/skills`, so it can sit beside `.agents/skills`.
+
+`python3 cricket test` runs those cases in a temporary directory.
 
 ### Phase 6 — optional orchestration
 
@@ -144,29 +158,36 @@ Those should sit above or beside Cricket commands rather than silently redefinin
 4. **Deterministic tools establish facts.**
 5. **Do not overbuild installation before adapters exist.**
 
+## Live sessions
+
+These sessions are separate from the deterministic checks. The checks still do not open a host.
+
+**Cursor — LIVE VALIDATED.** `/pitch` was explicitly invoked. Cursor loaded the Cricket skill and shared contract, and stated Ask / Smallest plan / Won't do before editing. A normal prompt without Cricket did not auto-trigger the skill. `/prove-it` performed real execution and file verification and ended with **PASS**.
+
+**Codex — LIVE VALIDATED.** `$pitch` was explicitly invoked. Codex loaded the Cricket skill and followed the shared contract, and stated Ask / Smallest plan / Won't do before editing. A normal prompt without Cricket did not auto-trigger Cricket. `$prove-it` performed real filesystem verification and ended with **PASS**.
+
+**Antigravity — LIVE VALIDATED.** `/pitch` was explicitly invoked. Antigravity loaded the installed `SKILL.md` and shared `COMMANDS.md`, stated Ask / Smallest plan / Won't do, and implemented the requested file. A normal prompt without Cricket did not invoke any Cricket skill. `/prove-it` performed real filesystem, content, and byte verification and ended with **PASS**. During that `/pitch` run, Antigravity also surfaced `challenge` as a used skill. That is observed host behavior on one explicit `/pitch` run. It is a platform-specific limitation, not a Portable v1 failure, because the normal prompt did not auto-run Cricket.
+
 ## Definition of portable-v1
 
-- [ ] seven-command core contract reviewed
-- [ ] Codex adapter working
-- [ ] Cursor adapter working
-- [ ] Antigravity adapter working
-- [ ] install instructions for each
-- [ ] same basic conformance checks across adapters
-- [ ] platform limitations documented
-- [ ] README no longer calls the adapters scaffolds
+Portable v1 is complete.
 
-A one-command installer is useful but not required for portable-v1.
+- **DONE** — seven-command core contract reviewed against the reference skills and the transcripts that exist.
+- **DONE** — Codex adapter. Deterministic check passes. LIVE VALIDATED for `$pitch`, a normal prompt that did not auto-trigger Cricket, and `$prove-it` ending **PASS**.
+- **DONE** — Cursor adapter. Deterministic check passes. LIVE VALIDATED for `/pitch`, a normal prompt that did not auto-trigger the skill, and `/prove-it` ending **PASS**.
+- **DONE** — Antigravity adapter. Deterministic check passes. LIVE VALIDATED for `/pitch`, a normal prompt that did not invoke any Cricket skill, and `/prove-it` ending **PASS**. One `/pitch` run also surfaced `challenge`.
+- **DONE** — install and update tooling. `python3 cricket install` and `python3 cricket update` are documented, and `python3 cricket test` covers them.
+- **DONE** — same basic conformance checks across adapters. Cursor, Codex, and Antigravity checks run `conformance/check.py` and require each command's bundled pass fixture to return no rule failures.
+- **DONE** — platform limitations documented in each adapter README, including the Antigravity `/pitch` observation.
+- **DONE** — README does not call the adapters scaffolds.
+
+Phase 6 has not been started.
 
 ## If we get sidetracked, resume here
 
-1. Read this file.
-2. Read `core/COMMANDS.md`.
-3. Inspect `.agents/skills/`.
-4. Pick exactly one adapter.
-5. Implement one command end-to-end.
-6. Test it against the core contract.
-7. Repeat for the other six.
-8. Only then generalize installation or build the next adapter.
+Portable v1 is complete. Do not start Phase 6 from this closeout.
+
+Leave model routing and the other Phase 6 ideas alone.
 
 The central question is:
 

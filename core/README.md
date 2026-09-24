@@ -14,7 +14,7 @@ It does not answer where a platform stores instructions or how that platform dis
 - `.agents/skills/*/SKILL.md` are the current working reference implementations used to derive and test that contract.
 - `adapters/` translates the contract into platform-specific forms.
 
-During this transition, do not delete or rewrite the working reference skills merely to make the directory structure look cleaner.
+Do not delete or rewrite the reference skills merely to make the directory structure look cleaner. They remain the reference copy.
 
 ## What belongs in core
 
