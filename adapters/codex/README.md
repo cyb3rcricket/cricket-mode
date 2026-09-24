@@ -1,6 +1,6 @@
 # Codex adapter
 
-**Status: implemented.**
+**Status: implemented. Discovery and conformance are deterministically checked. Live Codex behavior is not.**
 
 Codex exposes Cricket as [Agent Skills](https://developers.openai.com/codex/skills). Each command is a skill the user invokes as `$name`, or by choosing it in the `/skills` picker. The skill file is wiring. The behavior is `core/COMMANDS.md`.
 

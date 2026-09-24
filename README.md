@@ -36,7 +36,7 @@ Cricket Mode gives each moment a small, explicit command.
 
 ## Portable by design
 
-Cricket Mode is being separated into two layers:
+Cricket Mode is split into two layers:
 
 1. **Core behavior** — what each command means regardless of model, editor, or coding agent.
 2. **Adapters** — thin platform-specific glue for Codex, Cursor, Antigravity, and future environments.
@@ -54,7 +54,7 @@ The goal is **behavioral portability, not identical plumbing**.
        adapter         adapter        adapter
 ```
 
-The existing `.agents/skills/` directory remains the current working reference implementation while the portable layer is built.
+The `.agents/skills/` directory remains the reference implementation. Portable adapters are in `adapters/`.
 
 See **[Portable Cricket](docs/PORTABLE-CRICKET.md)** for the architecture, current status, and exact continuation plan. It is intentionally written so the project can be resumed after a long break without reconstructing the idea from chat history.
 
@@ -85,11 +85,11 @@ The currently working reference skills live in `.agents/skills/`.
 
 Copy any skill you want into an agent environment that supports the current skill format. You can install only the skills you want.
 
-**Important:** Cursor, Codex, and Antigravity adapters are implemented. From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. `python3 cricket update --target /path/to/project` refreshes an installed contract copy. Install notes are in each adapter README. Shared reply checks are in `conformance/`. Live Antigravity behavior has not been opened from this environment.
+**Important:** Cursor, Codex, and Antigravity adapters are implemented. From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. `python3 cricket update --target /path/to/project` refreshes an installed contract copy. Install notes are in each adapter README. Shared reply checks are in `conformance/`. Cursor, Codex, and Antigravity themselves were not opened from this environment.
 
 ## Usage
 
-When the installed environment exposes the behaviors, invoke the relevant command:
+Cursor and the Antigravity docs use a slash command. Codex uses `$name` or the `/skills` picker. The section headings in `core/COMMANDS.md` stay `/pitch` and the rest either way.
 
 ```text
 /chirp
@@ -100,6 +100,8 @@ When the installed environment exposes the behaviors, invoke the relevant comman
 /scrub
 /pitch
 ```
+
+Codex spelling: `$chirp`, `$senpai`, `$challenge`, `$prove-it`, `$drift`, `$scrub`, `$pitch`.
 
 The commands are intentionally small. They change how an agent approaches one moment; they are not a mandatory workflow framework.
 
@@ -128,18 +130,21 @@ Add complexity only when real use proves it is needed.
 
 ## Status
 
-Cricket Mode is early and experimental.
+Three labels are kept apart:
+
+- **IMPLEMENTED** — the files exist in this repository.
+- **DETERMINISTICALLY VERIFIED** — a script in this repository exercised that behavior. No host application was opened.
+- **REQUIRES LIVE PLATFORM VALIDATION** — only Cursor, Codex, or Antigravity itself can prove it.
 
 | Piece | Status |
 | --- | --- |
-| Seven current skills | Working reference implementation |
-| Platform-neutral command contract | Reviewed against the reference skills and existing examples |
-| Portable architecture documentation | Scaffolded |
-| Codex adapter | Implemented. Skills invoked as `$name`, wired to the core contract |
-| Cursor adapter | Implemented. Explicit skills wired to the core contract |
-| Shared conformance checks | Seven command cases in `conformance/` |
-| Antigravity adapter | Implemented as `/name` skills. Live app not run |
-| One-command installer | `python3 cricket install` for cursor, codex, or antigravity |
+| Seven reference skills | IMPLEMENTED in `.agents/skills/` |
+| Command contract | IMPLEMENTED. Reviewed against the reference skills and the existing examples |
+| Codex adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/codex/check.py` (`$name` skills plus conformance). REQUIRES LIVE CODEX VALIDATION |
+| Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py` (explicit `/name` skills and a contract copy). That check does not grade replies. REQUIRES LIVE CURSOR VALIDATION |
+| Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py` (`/name` skills plus conformance). REQUIRES LIVE ANTIGRAVITY VALIDATION |
+| Shared conformance checks | DETERMINISTICALLY VERIFIED by `python3 conformance/check.py`. The Cursor adapter check does not call it |
+| Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test` |
 
 ## License
 

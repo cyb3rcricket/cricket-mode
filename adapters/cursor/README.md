@@ -1,6 +1,6 @@
 # Cursor adapter
 
-**Status: implemented.**
+**Status: implemented. Discovery is deterministically checked. Live Cursor behavior is not.**
 
 Cursor exposes Cricket through [Agent Skills](https://cursor.com/docs/skills). Each command is a skill the user invokes with `/name` in Agent chat. The skill file is wiring. The behavior is `core/COMMANDS.md`.
 

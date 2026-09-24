@@ -8,13 +8,13 @@ An adapter may handle where instructions live, how commands are discovered/invok
 
 An adapter may **not** quietly change the meaning of a command.
 
-The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are `../conformance/`. Adapters call that module instead of copying the cases.
+The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are `../conformance/`. The Codex and Antigravity checks call that module. The Cursor check confirms discovery and the contract copy, and does not grade a reply.
 
 ## Current targets
 
-- `codex/` — implemented
-- `cursor/` — implemented
-- `antigravity/` — implemented; live app validation still required
+- `codex/` — implemented. Deterministic check passes. REQUIRES LIVE CODEX VALIDATION
+- `cursor/` — implemented. Deterministic check passes. REQUIRES LIVE CURSOR VALIDATION
+- `antigravity/` — implemented. Deterministic check passes. REQUIRES LIVE ANTIGRAVITY VALIDATION
 
 More adapters can be added later without changing the portable core.
 
