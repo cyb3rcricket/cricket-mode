@@ -70,7 +70,7 @@ The commands stay independent. Invoking one does not invoke the others.
 
 ## Limitations
 
-- Cursor will not reject a reply that skips the contract's result shape. The skill instructs the agent. `adapters/cursor/check.py` does not grade a reply. `conformance/check.py` can grade a reply string against the shared cases.
+- Cursor will not reject a reply that skips the contract's result shape. The skill instructs the agent. `adapters/cursor/check.py` grades the bundled conformance fixtures. It does not grade a live Cursor reply.
 - `.agents/skills/` in this repository is the older reference copy. Cursor loads it too. Those files do not set `disable-model-invocation`, and they carry their own wording. Installing this adapter into the cricket-mode repo can expose two skills with the same name. Install it into the project where you want the contract-backed commands.
 - The copied tree includes a symlink at `cricket-contract/COMMANDS.md`. Remove it with `rm -f`, then `cp core/COMMANDS.md` onto that path. Leaving the symlink points at this repository's `core/COMMANDS.md`. Outside that layout the read fails, and the skill stops instead of inventing a behavior.
 - `python3 cricket install cursor` writes only this adapter. `python3 cricket update` refreshes the installed contract copy and leaves the seven skill files in place.
@@ -84,4 +84,4 @@ From the repository root:
 python3 adapters/cursor/check.py
 ```
 
-The script installs the tree into a temporary project's `.cursor/skills/`, discovers the seven `SKILL.md` files, resolves each contract section, and checks that the skill text does not carry a second copy of the command behavior. It does not score a model reply.
+The script installs the tree into a temporary project's `.cursor/skills/`, discovers the seven `SKILL.md` files, resolves each contract section, and checks that the skill text does not carry a second copy of the command behavior. After that passes, it runs `conformance/check.py` and checks that each command's bundled pass fixture returns no rule failures. It does not open Cursor.

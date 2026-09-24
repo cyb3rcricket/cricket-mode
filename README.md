@@ -141,9 +141,9 @@ Three labels are kept apart:
 | Seven reference skills | IMPLEMENTED in `.agents/skills/` |
 | Command contract | IMPLEMENTED. Reviewed against the reference skills and the existing examples |
 | Codex adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/codex/check.py` (`$name` skills plus conformance). REQUIRES LIVE CODEX VALIDATION |
-| Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py` (explicit `/name` skills and a contract copy). That check does not grade replies. REQUIRES LIVE CURSOR VALIDATION |
+| Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py` (explicit `/name` skills, a contract copy, and conformance). REQUIRES LIVE CURSOR VALIDATION |
 | Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py` (`/name` skills plus conformance). REQUIRES LIVE ANTIGRAVITY VALIDATION |
-| Shared conformance checks | DETERMINISTICALLY VERIFIED by `python3 conformance/check.py`. The Cursor adapter check does not call it |
+| Shared conformance checks | DETERMINISTICALLY VERIFIED by `python3 conformance/check.py` and by each adapter check |
 | Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test` |
 
 ## License

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Install the Cursor adapter and check that Cursor can discover it.
+"""Install the Cursor adapter and check discovery plus conformance.
 
-This is the adapter's minimum contract check. It copies the skill tree into
-a temporary project's `.cursor/skills/` directory, then discovers `SKILL.md`
-files the way Cursor does. It does not score model replies.
+Copies the skill tree into a temporary project's `.cursor/skills/` directory,
+discovers `SKILL.md` files the way Cursor does, then runs the shared
+conformance suite. It does not open Cursor.
 """
 
 from __future__ import annotations
@@ -203,8 +203,37 @@ def main() -> int:
         for item in failures:
             print(f"- {item}")
         return 1
+
+    sys.path.insert(0, str(root))
+    from conformance import evaluate, load_cases
+
+    for case in load_cases():
+        sample = next(item for item in case["samples"] if item["fail"] == [])
+        got = evaluate(case["command"], sample["reply"], case)
+        print(f"/{case['command']}  conformance-pass={got or 'ok'}")
+        if got != []:
+            failures.append(f"{case['command']} pass sample failed conformance: {got}")
+
+    suite = subprocess.run(
+        [sys.executable, str(root / "conformance" / "check.py")],
+        cwd=root,
+        text=True,
+        capture_output=True,
+    )
+    if suite.returncode != 0:
+        failures.append("conformance/check.py failed")
+        print(suite.stdout)
+        print(suite.stderr)
+    else:
+        print("conformance/check.py PASS")
+
+    if failures:
+        print("FAIL")
+        for item in failures:
+            print(f"- {item}")
+        return 1
     print("PASS")
-    print(f"discovered {len(COMMANDS)} Cursor skills; each resolved section is the core contract")
+    print(f"discovered {len(COMMANDS)} Cursor skills; pass samples match conformance/")
     return 0
 
 

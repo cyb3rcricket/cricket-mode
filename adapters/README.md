@@ -8,7 +8,7 @@ An adapter may handle where instructions live, how commands are discovered/invok
 
 An adapter may **not** quietly change the meaning of a command.
 
-The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are `../conformance/`. The Codex and Antigravity checks call that module. The Cursor check confirms discovery and the contract copy, and does not grade a reply.
+The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are `../conformance/`. The Cursor, Codex, and Antigravity checks call that module.
 
 ## Current targets
 

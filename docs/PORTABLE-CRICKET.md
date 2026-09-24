@@ -76,7 +76,7 @@ Should we retry?       → agent judgment may help
 
 ### Conformance
 
-`conformance/` checks a reply against one shared case per command. The Codex and Antigravity checks call it. The Cursor check does not. The conformance checker does not call a model.
+`conformance/` checks a reply against one shared case per command. The Cursor, Codex, and Antigravity checks call it. The conformance checker does not call a model.
 
 ## Deliberately not built yet
 
@@ -102,11 +102,11 @@ Reviewed `core/COMMANDS.md` against `.agents/skills/*/SKILL.md` and the transcri
 
 Chose Cursor. The other adapters were left for later.
 
-`adapters/cursor/` exposes all seven commands as Cursor Agent Skills. Each `SKILL.md` is wiring: it points at one shared contract file. In this repository that file is a symlink to `core/COMMANDS.md`. Install steps, invocation, and limitations are in `adapters/cursor/README.md`. `adapters/cursor/check.py` installs that tree into a temporary project's `.cursor/skills/` and checks discovery plus the contract copy. It does not open Cursor and it does not grade a reply.
+`adapters/cursor/` exposes all seven commands as Cursor Agent Skills. Each `SKILL.md` is wiring: it points at one shared contract file. In this repository that file is a symlink to `core/COMMANDS.md`. Install steps, invocation, and limitations are in `adapters/cursor/README.md`. `adapters/cursor/check.py` installs that tree into a temporary project's `.cursor/skills/`, checks discovery plus the contract copy, and then runs `conformance/check.py`. It does not open Cursor.
 
 ### Phase 3 — conformance tests (done)
 
-`conformance/` is the shared behavior matrix. One case per command supplies the fixture. `conformance/check.py` encodes the contract checks once. `python3 conformance/check.py` scores the bundled pass and fail replies. A later adapter imports `evaluate` instead of copying the rules. The checker does not call a model. The Codex and Antigravity adapter checks run this suite. Neither check opens the host application.
+`conformance/` is the shared behavior matrix. One case per command supplies the fixture. `conformance/check.py` encodes the contract checks once. `python3 conformance/check.py` scores the bundled pass and fail replies. A later adapter imports `evaluate` instead of copying the rules. The checker does not call a model. The Cursor, Codex, and Antigravity adapter checks run this suite. None of them opens the host application.
 
 ### Phase 4 — second and third adapters
 
@@ -162,10 +162,10 @@ Those should sit above or beside Cricket commands rather than silently redefinin
 
 - **DONE** — seven-command core contract reviewed against the reference skills and the transcripts that exist.
 - **NEEDS LIVE VALIDATION** — Codex adapter. `python3 adapters/codex/check.py` passes. Codex itself was not run.
-- **NEEDS LIVE VALIDATION** — Cursor adapter. `python3 adapters/cursor/check.py` passes. Cursor itself was not run, and that check does not grade replies.
+- **NEEDS LIVE VALIDATION** — Cursor adapter. `python3 adapters/cursor/check.py` passes. Cursor itself was not run.
 - **NEEDS LIVE VALIDATION** — Antigravity adapter. `python3 adapters/antigravity/check.py` passes. Antigravity itself was not run. The dogfood steps are in `adapters/antigravity/README.md`.
 - **DONE** — install instructions for each adapter, and `python3 cricket install`.
-- **NOT DONE** — same basic conformance checks across adapters. Codex and Antigravity checks run `conformance/check.py`. The Cursor check stops at discovery and the contract copy.
+- **DONE** — same basic conformance checks across adapters. Cursor, Codex, and Antigravity checks run `conformance/check.py` and require each command's bundled pass fixture to return no rule failures.
 - **DONE** — platform limitations documented in each adapter README.
 - **DONE** — README does not call the adapters scaffolds.
 
