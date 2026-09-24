@@ -72,7 +72,7 @@ Should we retry?       → agent judgment may help
 
 ### Adapters
 
-`adapters/cursor/` and `adapters/codex/` expose the seven commands through each host's skill mechanism. Both read `core/COMMANDS.md`. `adapters/antigravity/` is still an implementation placeholder.
+`adapters/cursor/`, `adapters/codex/`, and `adapters/antigravity/` expose the seven commands through each host's skill mechanism. All three read `core/COMMANDS.md`. Live Antigravity behavior is not verified from this environment.
 
 ### Conformance
 
@@ -110,13 +110,13 @@ Chose Cursor. The other adapters were left for later.
 
 ### Phase 3 — conformance tests (done)
 
-`conformance/` is the shared behavior matrix. One case per command supplies the fixture. `conformance/check.py` encodes the contract checks once. `python3 conformance/check.py` scores the bundled pass and fail replies. A later adapter imports `evaluate` instead of copying the rules. The checker does not call a model. The Codex adapter check runs this suite. Antigravity does not yet.
+`conformance/` is the shared behavior matrix. One case per command supplies the fixture. `conformance/check.py` encodes the contract checks once. `python3 conformance/check.py` scores the bundled pass and fail replies. A later adapter imports `evaluate` instead of copying the rules. The checker does not call a model. The Codex and Antigravity adapter checks run this suite. Neither check opens the host application.
 
 ### Phase 4 — second and third adapters
 
 **Codex (done).** `adapters/codex/` exposes the seven commands as Codex skills invoked with `$name`, not as `/name` slash commands. Each skill points at one shared contract file. `agents/openai.yaml` sets `allow_implicit_invocation: false`. Install steps and limitations are in `adapters/codex/README.md`. `adapters/codex/check.py` installs that tree into a temporary project's `.agents/skills/` and runs `conformance/check.py`.
 
-**Antigravity:** not started.
+**Antigravity (adapter written).** `adapters/antigravity/` exposes the seven commands as Antigravity skills. The documented invoke is `/name`. Official skill frontmatter has no switch that disables autonomous activation. `adapters/antigravity/check.py` installs the tree and runs `conformance/check.py`. Opening Antigravity is still required before calling the live behavior verified. See `adapters/antigravity/README.md`.
 
 ### Phase 5 — installation/update tooling
 
@@ -160,11 +160,11 @@ A one-command installer is useful but not required for portable-v1.
 
 ## If we get sidetracked, resume here
 
-Codex is complete. Resume at the Antigravity half of Phase 4. Reuse the Cursor and Codex adapters as patterns and `conformance/` as the shared cases. Leave the installer for Phase 5.
+The Antigravity adapter is written. Resume at Phase 5: a small installer. Do not start Phase 6.
 
 1. Read this file.
-2. Read `core/COMMANDS.md`, `adapters/codex/README.md`, and `conformance/README.md`.
-3. Implement the Antigravity adapter. Do not mark it done until its own check passes.
+2. Read `adapters/antigravity/README.md` and `conformance/README.md`.
+3. Add the small installer in Phase 5. Leave model routing and the other Phase 6 ideas alone.
 
 The central question is:
 

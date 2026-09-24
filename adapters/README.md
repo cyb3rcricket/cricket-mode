@@ -14,7 +14,7 @@ The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are
 
 - `codex/` — implemented
 - `cursor/` — implemented
-- `antigravity/` — scaffold
+- `antigravity/` — implemented; live app validation still required
 
 More adapters can be added later without changing the portable core.
 

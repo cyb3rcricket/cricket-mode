@@ -84,7 +84,7 @@ The currently working reference skills live in `.agents/skills/`.
 
 Copy any skill you want into an agent environment that supports the current skill format. You can install only the skills you want.
 
-**Important:** the Cursor and Codex adapters are implemented. Install notes are in `adapters/cursor/README.md` and `adapters/codex/README.md`. Shared reply checks are in `conformance/`. Antigravity is still a scaffold. There is no one-command installer yet.
+**Important:** Cursor, Codex, and Antigravity adapters are implemented. Install notes are in each adapter README. Shared reply checks are in `conformance/`. Live Antigravity behavior has not been opened from this environment. There is no one-command installer yet.
 
 ## Usage
 
@@ -137,7 +137,7 @@ Cricket Mode is early and experimental.
 | Codex adapter | Implemented. Skills invoked as `$name`, wired to the core contract |
 | Cursor adapter | Implemented. Explicit skills wired to the core contract |
 | Shared conformance checks | Seven command cases in `conformance/` |
-| Antigravity adapter | Planned / scaffold only |
+| Antigravity adapter | Implemented as `/name` skills. Live app not run |
 | One-command installer | Planned |
 
 ## License
