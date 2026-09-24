@@ -16,11 +16,13 @@ result = decide({
 })
 ```
 
-`decide` returns `lane`, `decision`, `model`, `verified_completion`, `unresolved_failures`, `recommendations`, and `max_attempts`. `model` is always `null`. `max_attempts` is 2. The caller passes `attempt`. There is no loop inside `decide`.
+`decide` returns `lane`, `decision`, `model`, `verified_completion`, `unresolved_failures`, `unrelated_failures`, `recommendations`, and `max_attempts`. `model` is always `null`. `max_attempts` is 2. The caller passes `attempt`. There is no loop inside `decide`.
 
 Lanes are `FAST`, `STANDARD`, `DEEP`, and `ESCALATE`. Check states are `PASSED`, `FAILED`, `NOT RUN`, `NOT RELEVANT`, and `NOT AVAILABLE`.
 
-`COMPLETE` is not a `/prove-it` PASS. `verified_completion` is true only when a check was reported `PASSED`. A task can be `COMPLETE` with `verified_completion: false`.
+A check may set `relation` to `RELATED`, `UNRELATED`, or `UNKNOWN`. Omitted relation is `UNKNOWN`. `FAILED` plus `RELATED` or `UNKNOWN` still drives `RETRY` or `ESCALATE`. `FAILED` plus `UNRELATED` is listed in `unrelated_failures` and does not retry, escalate, or clear a passed related check. The policy does not infer relation.
+
+`COMPLETE` is not a `/prove-it` PASS. `verified_completion` is true only when a check was reported `PASSED` and no `RELATED` or `UNKNOWN` check failed. A task can be `COMPLETE` with `verified_completion: false`.
 
 Recommendations name at most two of `prove-it`, `challenge`, and `drift`. They are not invoked. `pitch`, `chirp`, `senpai`, and `scrub` stay explicit.
 

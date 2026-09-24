@@ -15,6 +15,19 @@ MAX_ATTEMPTS = 2
 # are intentionally broad; that over-calls DEEP and stays that way until a
 # real task shows it is wrong.
 _DEEP = re.compile(r"\b(auth|session|architecture)\b", re.IGNORECASE)
+_RELATIONS = ("RELATED", "UNRELATED", "UNKNOWN")
+
+
+def _relation(item: dict) -> str:
+    """Caller-supplied link between a check and this task. Omitted means UNKNOWN."""
+    relation = item.get("relation")
+    if relation in _RELATIONS:
+        return relation
+    return "UNKNOWN"
+
+
+def _check_name(item: dict) -> str:
+    return item.get("name", "check")
 
 
 def decide(task: dict) -> dict:
@@ -37,14 +50,16 @@ def decide(task: dict) -> dict:
         lane = "STANDARD"
 
     failed = [item for item in checks if item.get("status") == "FAILED"]
+    actionable = [item for item in failed if _relation(item) != "UNRELATED"]
+    unrelated = [item for item in failed if _relation(item) == "UNRELATED"]
     not_run = [item for item in checks if item.get("status") == "NOT RUN"]
     passed = [item for item in checks if item.get("status") == "PASSED"]
 
     if blown:
         decision = "ESCALATE"
-    elif failed and attempt <= 1:
+    elif actionable and attempt <= 1:
         decision = "RETRY"
-    elif failed:
+    elif actionable:
         decision = "ESCALATE"
     elif not_run:
         decision = "BLOCKED"
@@ -54,9 +69,9 @@ def decide(task: dict) -> dict:
     recommendations = []
     if blown:
         recommendations.append("drift")
-    if (failed and attempt <= 1) or not_run:
+    if (actionable and attempt <= 1) or not_run:
         recommendations.append("prove-it")
-    if deep or (failed and attempt >= 2):
+    if deep or (actionable and attempt >= 2):
         recommendations.append("challenge")
 
     ordered = []
@@ -68,8 +83,9 @@ def decide(task: dict) -> dict:
         "lane": lane,
         "decision": decision,
         "model": None,
-        "verified_completion": bool(passed),
-        "unresolved_failures": [item.get("name", "check") for item in failed],
+        "verified_completion": bool(passed) and not actionable,
+        "unresolved_failures": [_check_name(item) for item in actionable],
+        "unrelated_failures": [_check_name(item) for item in unrelated],
         "recommendations": ordered[:2],
         "max_attempts": MAX_ATTEMPTS,
     }
