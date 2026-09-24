@@ -11,9 +11,11 @@ from pathlib import Path
 
 MAX_ATTEMPTS = 2
 
-# Word boundaries so "author" is not "auth". "architecture" still marks DEEP.
+# Word boundaries so "author" is not "auth".
 # "session" does not: a chat-history trim was classified DEEP from that word alone.
-_DEEP = re.compile(r"\b(auth|architecture)\b", re.IGNORECASE)
+# "architecture" does not: a two-file schema/handler check was classified DEEP
+# from that word alone.
+_DEEP = re.compile(r"\bauth\b", re.IGNORECASE)
 _RELATIONS = ("RELATED", "UNRELATED", "UNKNOWN")
 
 

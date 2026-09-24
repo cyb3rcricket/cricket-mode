@@ -664,6 +664,35 @@
     }
   },
   {
+    "name": "loremaster-tool-architecture",
+    "task": {
+      "summary": "Correct the chat-loop comment that misplaces tool schemas, and check the tool architecture keeps each schema name paired with a handler.",
+      "expected_files": 2,
+      "changed_files": [
+        "src/bot.py",
+        "tests/test_p1_regressions.py"
+      ],
+      "attempt": 1,
+      "checks": [
+        {
+          "name": "pytest tests/test_p1_regressions.py::test_tool_schema_names_match_handlers",
+          "status": "PASSED",
+          "relation": "RELATED"
+        }
+      ]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "unrelated_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
+    }
+  },
+  {
     "name": "unrelated-only",
     "task": {
       "summary": "Add a name search for quests",
