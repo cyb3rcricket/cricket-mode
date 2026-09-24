@@ -1,6 +1,6 @@
 # Antigravity adapter
 
-**Status: implemented. Slash-command discovery is deterministically checked. Live Antigravity behavior is not.**
+**Status: implemented. Discovery and conformance are deterministically checked. LIVE VALIDATED for the session below.**
 
 Antigravity exposes reusable project behavior as [Agent Skills](https://antigravity.google/docs/skills). A skill is a folder with `SKILL.md`. Workspace skills live in `.agents/skills/<name>/`. Antigravity 2.0, the Antigravity CLI, and the Antigravity IDE all document that path. `.agent/skills` is a legacy path Antigravity still reads. This adapter installs only the current path.
 
@@ -68,19 +68,18 @@ In the Antigravity prompt, the documented command is:
 
 ## Limitations
 
-- Autonomous activation is on. Antigravity's skill frontmatter documents `name` and `description` only. There is no documented switch corresponding to Cursor's `disable-model-invocation` or Codex's `allow_implicit_invocation: false`. These descriptions say to apply the skill only when the user types the slash command. Whether Antigravity obeys that is not something this repository can prove.
+- Antigravity's skill frontmatter documents `name` and `description` only. There is no documented switch corresponding to Cursor's `disable-model-invocation` or Codex's `allow_implicit_invocation: false`. In the live session, a normal prompt did not invoke any Cricket skill. During the explicit `/pitch` run, Antigravity also surfaced `challenge` as a used skill. That is one observed run, not a finding that normal prompts auto-run Cricket.
 - `.agents/skills` is shared with Codex and with this repo's reference skills. The installer refuses that overwrite. A hand copy still replaces a same-named skill folder.
 - Legacy `.agent/skills` is still scanned. This adapter does not write it. A project that also has `.agent/skills/<name>` can load a second copy.
 - Antigravity does not grade the reply shape. `adapters/antigravity/check.py` installs the tree and runs `conformance/check.py`. It does not open Antigravity.
 - `python3 cricket install antigravity` writes only this adapter. `python3 cricket update` refreshes the installed contract copy and leaves the skill files in place.
 
-## REQUIRES LIVE ANTIGRAVITY VALIDATION
+## Live session
 
-1. From a cricket-mode checkout, install into an empty project with the commands above.
-2. Open that project in Antigravity.
-3. Start a prompt and type `/pitch`. Confirm the skill is offered and that the reply follows the `/pitch` section of `.agents/skills/cricket-contract/COMMANDS.md`.
-4. In a new prompt, ask to clamp a code change without typing `/pitch`. Record whether Antigravity loads the skill anyway.
-5. Repeat step 3 for `/chirp`, `/senpai`, `/challenge`, `/prove-it`, `/drift`, and `/scrub`.
+- `/pitch` was explicitly invoked. Antigravity loaded the installed `SKILL.md` and shared `COMMANDS.md`, stated Ask / Smallest plan / Won't do, and implemented the requested file.
+- A normal prompt without Cricket did not invoke any Cricket skill.
+- `/prove-it` performed real filesystem, content, and byte verification and ended with **PASS**.
+- During that `/pitch` run, Antigravity also surfaced `challenge` as a used skill. The normal prompt did not auto-run Cricket.
 
 ## Check
 

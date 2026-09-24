@@ -172,7 +172,7 @@ def main() -> int:
         return 1
     print("PASS")
     print("installed 7 Antigravity skills; pass samples match conformance/")
-    print("REQUIRES LIVE ANTIGRAVITY VALIDATION")
+    print("deterministic check only; this script does not open Antigravity")
     return 0
 
 

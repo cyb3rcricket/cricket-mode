@@ -72,7 +72,7 @@ Should we retry?       → agent judgment may help
 
 ### Adapters
 
-`adapters/cursor/`, `adapters/codex/`, and `adapters/antigravity/` expose the seven commands through each host's skill mechanism. All three read `core/COMMANDS.md`. None of the adapter checks opens Cursor, Codex, or Antigravity.
+`adapters/cursor/`, `adapters/codex/`, and `adapters/antigravity/` expose the seven commands through each host's skill mechanism. All three read `core/COMMANDS.md`. The adapter checks do not open the hosts. Live sessions for Cursor, Codex, and Antigravity are recorded below. Portable v1 is complete.
 
 ### Conformance
 
@@ -88,7 +88,7 @@ Do not assume these exist:
 - Jev integration,
 - autonomous retry loops.
 
-The seven behaviors now have adapters and an installer. Phase 6 stays unbuilt until live use shows that an orchestration idea is needed.
+The seven behaviors have adapters, an installer, and recorded live sessions. Phase 6 has not been started.
 
 ## Implementation plan
 
@@ -102,7 +102,7 @@ Reviewed `core/COMMANDS.md` against `.agents/skills/*/SKILL.md` and the transcri
 
 Chose Cursor. The other adapters were left for later.
 
-`adapters/cursor/` exposes all seven commands as Cursor Agent Skills. Each `SKILL.md` is wiring: it points at one shared contract file. In this repository that file is a symlink to `core/COMMANDS.md`. Install steps, invocation, and limitations are in `adapters/cursor/README.md`. `adapters/cursor/check.py` installs that tree into a temporary project's `.cursor/skills/`, checks discovery plus the contract copy, and then runs `conformance/check.py`. It does not open Cursor.
+`adapters/cursor/` exposes all seven commands as Cursor Agent Skills. Each `SKILL.md` is wiring: it points at one shared contract file. In this repository that file is a symlink to `core/COMMANDS.md`. Install steps, invocation, and limitations are in `adapters/cursor/README.md`. `adapters/cursor/check.py` installs that tree into a temporary project's `.cursor/skills/`, checks discovery plus the contract copy, and then runs `conformance/check.py`. That script does not open Cursor. The live session is recorded under Live sessions.
 
 ### Phase 3 — conformance tests (done)
 
@@ -110,9 +110,9 @@ Chose Cursor. The other adapters were left for later.
 
 ### Phase 4 — second and third adapters
 
-**Codex (adapter written).** `adapters/codex/` exposes the seven commands as Codex skills invoked with `$name`, not as `/name` slash commands. Each skill points at one shared contract file. `agents/openai.yaml` sets `allow_implicit_invocation: false`. Install steps and limitations are in `adapters/codex/README.md`. `adapters/codex/check.py` installs that tree into a temporary project's `.agents/skills/` and runs `conformance/check.py`. Opening Codex is still required before calling the live behavior verified.
+**Codex (done).** `adapters/codex/` exposes the seven commands as Codex skills invoked with `$name`, not as `/name` slash commands. Each skill points at one shared contract file. `agents/openai.yaml` sets `allow_implicit_invocation: false`. Install steps and limitations are in `adapters/codex/README.md`. `adapters/codex/check.py` installs that tree into a temporary project's `.agents/skills/` and runs `conformance/check.py`. That script does not open Codex. The live session is recorded under Live sessions.
 
-**Antigravity (adapter written).** `adapters/antigravity/` exposes the seven commands as Antigravity skills. The documented invoke is `/name`. Official skill frontmatter has no switch that disables autonomous activation. `adapters/antigravity/check.py` installs the tree and runs `conformance/check.py`. Opening Antigravity is still required before calling the live behavior verified. See `adapters/antigravity/README.md`.
+**Antigravity (done).** `adapters/antigravity/` exposes the seven commands as Antigravity skills. The documented invoke is `/name`. Official skill frontmatter has no switch that disables autonomous activation. `adapters/antigravity/check.py` installs the tree and runs `conformance/check.py`. That script does not open Antigravity. The live session, including one `/pitch` run that also surfaced `challenge`, is recorded under Live sessions and in `adapters/antigravity/README.md`.
 
 ### Phase 5 — installation/update tooling (done)
 
@@ -158,28 +158,34 @@ Those should sit above or beside Cricket commands rather than silently redefinin
 4. **Deterministic tools establish facts.**
 5. **Do not overbuild installation before adapters exist.**
 
+## Live sessions
+
+These sessions are separate from the deterministic checks. The checks still do not open a host.
+
+**Cursor — LIVE VALIDATED.** `/pitch` was explicitly invoked. Cursor loaded the Cricket skill and shared contract, and stated Ask / Smallest plan / Won't do before editing. A normal prompt without Cricket did not auto-trigger the skill. `/prove-it` performed real execution and file verification and ended with **PASS**.
+
+**Codex — LIVE VALIDATED.** `$pitch` was explicitly invoked. Codex loaded the Cricket skill and followed the shared contract, and stated Ask / Smallest plan / Won't do before editing. A normal prompt without Cricket did not auto-trigger Cricket. `$prove-it` performed real filesystem verification and ended with **PASS**.
+
+**Antigravity — LIVE VALIDATED.** `/pitch` was explicitly invoked. Antigravity loaded the installed `SKILL.md` and shared `COMMANDS.md`, stated Ask / Smallest plan / Won't do, and implemented the requested file. A normal prompt without Cricket did not invoke any Cricket skill. `/prove-it` performed real filesystem, content, and byte verification and ended with **PASS**. During that `/pitch` run, Antigravity also surfaced `challenge` as a used skill. That is observed host behavior on one explicit `/pitch` run. It is a platform-specific limitation, not a Portable v1 failure, because the normal prompt did not auto-run Cricket.
+
 ## Definition of portable-v1
 
+Portable v1 is complete.
+
 - **DONE** — seven-command core contract reviewed against the reference skills and the transcripts that exist.
-- **NEEDS LIVE VALIDATION** — Codex adapter. `python3 adapters/codex/check.py` passes. Codex itself was not run.
-- **NEEDS LIVE VALIDATION** — Cursor adapter. `python3 adapters/cursor/check.py` passes. Cursor itself was not run.
-- **NEEDS LIVE VALIDATION** — Antigravity adapter. `python3 adapters/antigravity/check.py` passes. Antigravity itself was not run. The dogfood steps are in `adapters/antigravity/README.md`.
-- **DONE** — install instructions for each adapter, and `python3 cricket install`.
+- **DONE** — Codex adapter. Deterministic check passes. LIVE VALIDATED for `$pitch`, a normal prompt that did not auto-trigger Cricket, and `$prove-it` ending **PASS**.
+- **DONE** — Cursor adapter. Deterministic check passes. LIVE VALIDATED for `/pitch`, a normal prompt that did not auto-trigger the skill, and `/prove-it` ending **PASS**.
+- **DONE** — Antigravity adapter. Deterministic check passes. LIVE VALIDATED for `/pitch`, a normal prompt that did not invoke any Cricket skill, and `/prove-it` ending **PASS**. One `/pitch` run also surfaced `challenge`.
+- **DONE** — install and update tooling. `python3 cricket install` and `python3 cricket update` are documented, and `python3 cricket test` covers them.
 - **DONE** — same basic conformance checks across adapters. Cursor, Codex, and Antigravity checks run `conformance/check.py` and require each command's bundled pass fixture to return no rule failures.
-- **DONE** — platform limitations documented in each adapter README.
+- **DONE** — platform limitations documented in each adapter README, including the Antigravity `/pitch` observation.
 - **DONE** — README does not call the adapters scaffolds.
 
-`python3 cricket` is implemented. `python3 cricket test` passes on temporary projects. The installer was not required for this definition. Phase 6 has not been started.
+Phase 6 has not been started.
 
 ## If we get sidetracked, resume here
 
-The work that does not need a host app is in place. Do not start Phase 6.
-
-Next action is one live check per host, each in an empty project:
-
-1. `python3 cricket install cursor --target /tmp/cricket-cursor`. Open that project in Cursor, type `/pitch`, and confirm the skill runs only when invoked.
-2. `python3 cricket install codex --target /tmp/cricket-codex`. Open that project in Codex and invoke `$pitch`.
-3. Follow the five steps under **REQUIRES LIVE ANTIGRAVITY VALIDATION** in `adapters/antigravity/README.md`.
+Portable v1 is complete. Do not start Phase 6 from this closeout.
 
 Leave model routing and the other Phase 6 ideas alone.
 

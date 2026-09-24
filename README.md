@@ -85,7 +85,7 @@ The currently working reference skills live in `.agents/skills/`.
 
 Copy any skill you want into an agent environment that supports the current skill format. You can install only the skills you want.
 
-**Important:** Cursor, Codex, and Antigravity adapters are implemented. From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. `python3 cricket update --target /path/to/project` refreshes an installed contract copy. Install notes are in each adapter README. Shared reply checks are in `conformance/`. Cursor, Codex, and Antigravity themselves were not opened from this environment.
+**Important:** Portable v1 is complete. From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. `python3 cricket update --target /path/to/project` refreshes an installed contract copy. Install notes and the live-session records are in each adapter README. Shared reply checks are in `conformance/`. The adapter scripts still do not open the host applications. The live sessions are recorded separately below.
 
 ## Usage
 
@@ -133,18 +133,20 @@ Add complexity only when real use proves it is needed.
 Three labels are kept apart:
 
 - **IMPLEMENTED** — the files exist in this repository.
-- **DETERMINISTICALLY VERIFIED** — a script in this repository exercised that behavior. No host application was opened.
-- **REQUIRES LIVE PLATFORM VALIDATION** — only Cursor, Codex, or Antigravity itself can prove it.
+- **DETERMINISTICALLY VERIFIED** — a script in this repository exercised that behavior. The script does not open the host application.
+- **LIVE VALIDATED** — the named host was run, and the session matched the notes below.
+
+Portable v1 is complete. Phase 6 has not been started.
 
 | Piece | Status |
 | --- | --- |
 | Seven reference skills | IMPLEMENTED in `.agents/skills/` |
 | Command contract | IMPLEMENTED. Reviewed against the reference skills and the existing examples |
-| Codex adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/codex/check.py` (`$name` skills plus conformance). REQUIRES LIVE CODEX VALIDATION |
-| Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py` (explicit `/name` skills, a contract copy, and conformance). REQUIRES LIVE CURSOR VALIDATION |
-| Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py` (`/name` skills plus conformance). REQUIRES LIVE ANTIGRAVITY VALIDATION |
+| Codex adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/codex/check.py`. LIVE VALIDATED: `$pitch` loaded the skill and contract, stated Ask / Smallest plan / Won't do before editing, a normal prompt did not auto-trigger Cricket, and `$prove-it` verified the filesystem and ended **PASS** |
+| Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py`. LIVE VALIDATED: `/pitch` loaded the skill and contract, stated Ask / Smallest plan / Won't do before editing, a normal prompt did not auto-trigger the skill, and `/prove-it` verified execution and files and ended **PASS** |
+| Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py`. LIVE VALIDATED: `/pitch` loaded the installed skill and contract, stated Ask / Smallest plan / Won't do, and wrote the requested file. A normal prompt did not invoke any Cricket skill. `/prove-it` verified filesystem, content, and bytes and ended **PASS**. That `/pitch` run also surfaced `challenge` as a used skill |
 | Shared conformance checks | DETERMINISTICALLY VERIFIED by `python3 conformance/check.py` and by each adapter check |
-| Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test` |
+| Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test`. Install and update tooling is complete |
 
 ## License
 

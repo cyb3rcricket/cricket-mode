@@ -1,6 +1,6 @@
 # Cursor adapter
 
-**Status: implemented. Discovery is deterministically checked. Live Cursor behavior is not.**
+**Status: implemented. Discovery and conformance are deterministically checked. LIVE VALIDATED for the session below.**
 
 Cursor exposes Cricket through [Agent Skills](https://cursor.com/docs/skills). Each command is a skill the user invokes with `/name` in Agent chat. The skill file is wiring. The behavior is `core/COMMANDS.md`.
 
@@ -75,6 +75,12 @@ The commands stay independent. Invoking one does not invoke the others.
 - The copied tree includes a symlink at `cricket-contract/COMMANDS.md`. Remove it with `rm -f`, then `cp core/COMMANDS.md` onto that path. Leaving the symlink points at this repository's `core/COMMANDS.md`. Outside that layout the read fails, and the skill stops instead of inventing a behavior.
 - `python3 cricket install cursor` writes only this adapter. `python3 cricket update` refreshes the installed contract copy and leaves the seven skill files in place.
 - Legacy `.cursor/commands/*.md` files are not this adapter. Cursor's current mechanism for this kind of explicit command is a skill with `disable-model-invocation: true`.
+
+## Live session
+
+- `/pitch` was explicitly invoked. Cursor loaded the Cricket skill and shared contract, and stated Ask / Smallest plan / Won't do before editing.
+- A normal prompt without Cricket did not auto-trigger the skill.
+- `/prove-it` performed real execution and file verification and ended with **PASS**.
 
 ## Check
 

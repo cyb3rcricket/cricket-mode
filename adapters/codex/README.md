@@ -1,6 +1,6 @@
 # Codex adapter
 
-**Status: implemented. Discovery and conformance are deterministically checked. Live Codex behavior is not.**
+**Status: implemented. Discovery and conformance are deterministically checked. LIVE VALIDATED for the session below.**
 
 Codex exposes Cricket as [Agent Skills](https://developers.openai.com/codex/skills). Each command is a skill the user invokes as `$name`, or by choosing it in the `/skills` picker. The skill file is wiring. The behavior is `core/COMMANDS.md`.
 
@@ -78,6 +78,12 @@ $scrub
 - Codex can shorten or omit skill descriptions when many skills are installed. These seven descriptions are one line each.
 - Two skills with the same name in different scopes both appear. Codex does not merge them.
 - `python3 cricket install codex` writes only this adapter. Antigravity uses the same `.agents/skills` path, so the installer will not replace one with the other. `python3 cricket update` refreshes the installed contract copy and leaves the skill files in place.
+
+## Live session
+
+- `$pitch` was explicitly invoked. Codex loaded the Cricket skill and followed the shared contract, and stated Ask / Smallest plan / Won't do before editing.
+- A normal prompt without Cricket did not auto-trigger Cricket.
+- `$prove-it` performed real filesystem verification and ended with **PASS**.
 
 ## Check
 

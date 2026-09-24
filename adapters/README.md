@@ -12,9 +12,9 @@ The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are
 
 ## Current targets
 
-- `codex/` — implemented. Deterministic check passes. REQUIRES LIVE CODEX VALIDATION
-- `cursor/` — implemented. Deterministic check passes. REQUIRES LIVE CURSOR VALIDATION
-- `antigravity/` — implemented. Deterministic check passes. REQUIRES LIVE ANTIGRAVITY VALIDATION
+- `codex/` — implemented. Deterministic check passes. LIVE VALIDATED for `$pitch` and `$prove-it`
+- `cursor/` — implemented. Deterministic check passes. LIVE VALIDATED for `/pitch` and `/prove-it`
+- `antigravity/` — implemented. Deterministic check passes. LIVE VALIDATED for `/pitch` and `/prove-it`. One `/pitch` run also surfaced `challenge`
 
 More adapters can be added later without changing the portable core.
 
