@@ -7,7 +7,6 @@ model, run tests, invoke Cricket, or remember earlier attempts.
 from __future__ import annotations
 
 import re
-from pathlib import Path
 
 MAX_ATTEMPTS = 2
 
@@ -90,24 +89,3 @@ def decide(task: dict) -> dict:
         "recommendations": ordered[:2],
         "max_attempts": MAX_ATTEMPTS,
     }
-
-
-def discover_checks(root: Path | str) -> list[str]:
-    """List declared check names. Read files only. Do not run them."""
-    makefile = Path(root) / "Makefile"
-    if not makefile.is_file():
-        return []
-    names = []
-    text = makefile.read_text()
-    for line in text.splitlines():
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#") or line[:1] in ("\t", " "):
-            continue
-        if ":" not in stripped:
-            continue
-        target = stripped.split(":", 1)[0].strip()
-        if target and not target.startswith(".") and target not in names:
-            names.append(target)
-    if re.search(r"\bpytest\b", text) and "pytest" not in names:
-        names.append("pytest")
-    return names

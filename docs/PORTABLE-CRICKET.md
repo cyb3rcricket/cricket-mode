@@ -146,11 +146,15 @@ Codex and Antigravity both use `.agents/skills`. This repository keeps its refer
 
 ### Phase 6 — optional orchestration
 
-`orchestration/policy.py` is a pure function. A task dict goes in. A result dict comes out. `model` is always null. The caller passes `attempt`. `max_attempts` is 2. There is no loop inside `decide`.
+`orchestration/policy.py` is a pure function. The caller supplies the summary, `expected_files`, `changed_files`, `attempt`, and check results. A result dict comes out. `decide` does not read the repo, store attempts, run checks, invoke Cricket, or select a model. `model` is always null. There is no vendor model mapping. `max_attempts` is 2. There is no loop inside `decide`.
 
-Recommendations may name `prove-it`, `challenge`, or `drift`, and at most two of them. Nothing is invoked. `pitch`, `chirp`, `senpai`, and `scrub` stay explicit. The installer still copies only the seven commands. `core/COMMANDS.md` does not mention lanes.
+Lanes, in order: `ESCALATE` when more than twice the expected files changed; otherwise `DEEP` only for the whole word `auth`; otherwise `FAST` for at most one changed file; otherwise `STANDARD`. `session` and `architecture` do not select a lane.
 
-Known limits, left in place: the caller must increment `attempt`; the word `architecture` marks a lane `DEEP`; blast radius needs `expected_files`; exactly twice the expected count does not escalate; `COMPLETE` with `verified_completion: false` is not a passed test; this layer has not been run inside a host.
+`FAILED` with `RELATED`, `UNKNOWN`, or no relation is a task failure. `FAILED` with `UNRELATED` stays visible and does not retry or escalate. Decision order: more than twice the expected file count is `ESCALATE`; otherwise a task failure is `RETRY` on attempt 1 and `ESCALATE` after that; otherwise `NOT RUN` is `BLOCKED`; otherwise `COMPLETE`.
+
+`COMPLETE` is not a `/prove-it` PASS. `verified_completion` is true only when a check was reported `PASSED` and no related or unknown check failed. Recommendations may name `prove-it`, `challenge`, or `drift`, at most two, and nothing is invoked. A `COMPLETE` task that is not `DEEP` recommends nothing. `pitch`, `chirp`, `senpai`, and `scrub` stay explicit. The installer still copies only the seven commands. `core/COMMANDS.md` does not mention lanes. Details and the call example are in `orchestration/README.md`.
+
+Known limits, left in place: the caller must increment `attempt`, and a missing attempt or `0` is treated as 1; a passing `auth` task still recommends `challenge`; blast radius needs `expected_files`; exactly twice the expected count does not escalate; `COMPLETE` with `verified_completion: false` is not a passed test; this layer has not been run inside a host.
 
 ## Guardrails for Future Us
 
@@ -189,7 +193,7 @@ Phase 6 policy is in `orchestration/`. Model routing, autonomous loops, and Phas
 
 Portable v1 is complete. The optional policy is in `orchestration/`. Do not start Phase 7 from this reconstruction.
 
-`session` is no longer a `DEEP` token. `architecture` still is. Do not start Phase 7 from this note.
+`session` and `architecture` are not `DEEP` tokens. `auth` still is. Do not start Phase 7 from this note.
 
 The central question is:
 

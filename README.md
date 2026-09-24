@@ -137,7 +137,7 @@ Three labels are kept apart:
 - **DETERMINISTICALLY VERIFIED** — a script in this repository exercised that behavior. The script does not open the host application.
 - **LIVE VALIDATED** — the named host was run, and the session matched the notes below.
 
-Portable v1 is complete. Phase 6 is an optional policy in `orchestration/`. It does not select a model, and it is not part of adapter install. It has not been run inside a host app.
+Portable v1 is complete. Phase 6 is an optional policy in `orchestration/`. It does not select a model, it does not invoke a Cricket command, and it is not part of adapter install. It has not been run inside a host app.
 
 | Piece | Status |
 | --- | --- |
