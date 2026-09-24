@@ -1,10 +1,10 @@
 # 🦗 Cricket Mode!
 
-Small, focused agent skills for working better with coding agents.
+Small, focused agent behaviors for working better with coding agents.
 
-Cricket Mode adds a handful of slash-command behaviors for common moments in AI-assisted development: simplify an explanation, teach the code that was just written, challenge an implementation, prove that something actually works, find where a project has drifted out of sync, scrub leftover agent fingerprints, or clamp scope to the asked-for change before you build.
+Cricket Mode adds command-sized behaviors for common moments in AI-assisted development: simplify an explanation, teach the code that was just written, challenge an implementation, prove that something actually works, find where a project has drifted out of sync, scrub leftover agent fingerprints, or clamp scope to the asked-for change before you build.
 
-Each skill does one thing.
+Each behavior does one thing.
 
 ## Skills
 
@@ -12,27 +12,17 @@ Each skill does one thing.
 | --- | --- |
 | `/chirp` | Makes the last explanation simpler, shorter, and easier to understand. |
 | `/senpai` | Teaches you what the agent just built, how it works, why it was done that way, and the reusable pattern behind it. |
-| `/challenge` | Tries to break the work before you trust it. Looks for bugs, weak assumptions, edge cases, and unintended behavior. |
-| `/prove-it` | Verifies the real behavior and shows evidence instead of merely claiming the work is correct. |
-| `/drift` | Finds places where the project no longer agrees with itself, such as code vs. tests, docs vs. behavior, or config vs. reality. |
-| `/scrub` | Finds leftover agent fingerprints in recent work, such as narrating comments, speculative helpers, and redundant wrappers, and proposes surgical removal. |
-| `/pitch` | Before writing code, clamps the work to the smallest change that solves the stated problem and asks before widening scope. |
+| `/challenge` | Tries to break the work before you trust it. |
+| `/prove-it` | Verifies real behavior and shows evidence instead of merely claiming the work is correct. |
+| `/drift` | Finds places where the project no longer agrees with itself. |
+| `/scrub` | Finds leftover agent fingerprints and proposes surgical removal. |
+| `/pitch` | Clamps the work to the smallest change that solves the stated problem before coding begins. |
 
 ## Why Cricket Mode?
 
-Coding agents are good at producing a lot of work quickly.
+Coding agents produce a lot of work quickly. That creates recurring problems: dense explanations, code you did not learn from, plausible bugs, weak verification, repository drift, AI residue, and agents inventing scope that was never requested.
 
-That creates a few recurring problems:
-
-- explanations get dense,
-- generated code can be hard to learn from,
-- plausible-looking implementations can hide mistakes,
-- passing code can still fail in the real application,
-- fast-moving repositories can slowly contradict themselves,
-- agent output can leave fingerprints that make the code noisier,
-- and agents go wide, inventing helpers and scope that were not asked for.
-
-Cricket Mode gives each of those moments a simple command.
+Cricket Mode gives each moment a small, explicit command.
 
 ```text
 /chirp      Make the last answer click.
@@ -44,109 +34,109 @@ Cricket Mode gives each of those moments a simple command.
 /pitch      Solve only what was asked. Ask before inventing.
 ```
 
-## Installation
+## Portable by design
 
-Copy any skill you want from:
+Cricket Mode is being separated into two layers:
 
-```text
-.agents/skills/
-```
+1. **Core behavior** — what each command means regardless of model, editor, or coding agent.
+2. **Adapters** — thin platform-specific glue for Codex, Cursor, Antigravity, and future environments.
 
-into the `.agents/skills/` directory of your project.
-
-For example:
+The goal is **behavioral portability, not identical plumbing**.
 
 ```text
-your-project/
-└── .agents/
-    └── skills/
-        ├── chirp/
-        │   └── SKILL.md
-        └── prove-it/
-            └── SKILL.md
+                    Cricket Mode
+                         │
+                 core behavior contract
+                         │
+          ┌──────────────┼──────────────┐
+          ▼              ▼              ▼
+       Codex          Cursor       Antigravity
+       adapter         adapter        adapter
 ```
 
-You can install only the skills you want.
+The existing `.agents/skills/` directory remains the current working reference implementation while the portable layer is built.
+
+See **[Portable Cricket](docs/PORTABLE-CRICKET.md)** for the architecture, current status, and exact continuation plan. It is intentionally written so the project can be resumed after a long break without reconstructing the idea from chat history.
+
+## Repository layout
+
+```text
+cricket-mode/
+├── .agents/skills/           # current working skill implementations
+├── core/
+│   ├── README.md             # portable-core rules
+│   └── COMMANDS.md           # platform-neutral behavior contract
+├── adapters/
+│   ├── README.md             # adapter contract
+│   ├── codex/README.md
+│   ├── cursor/README.md
+│   └── antigravity/README.md
+├── docs/
+│   └── PORTABLE-CRICKET.md   # architecture + resume plan
+├── AGENTS.md
+└── examples/
+```
+
+## Installation today
+
+The currently working reference skills live in `.agents/skills/`.
+
+Copy any skill you want into an agent environment that supports the current skill format. You can install only the skills you want.
+
+**Important:** the Codex, Cursor, and Antigravity adapter directories are currently scaffolds, not finished installers. Cross-agent installation is the next phase.
 
 ## Usage
 
-After the skills are available to your coding agent, invoke them directly:
+When the installed environment exposes the behaviors, invoke the relevant command:
 
 ```text
 /chirp
-```
-
-```text
 /senpai
-```
-
-```text
 /challenge
-```
-
-```text
 /prove-it
-```
-
-```text
 /drift
-```
-
-```text
 /scrub
-```
-
-```text
 /pitch
 ```
 
-The commands are intentionally small. They are meant to change how the agent approaches a task, not introduce a giant workflow framework.
+The commands are intentionally small. They change how an agent approaches one moment; they are not a mandatory workflow framework.
 
 ## Examples
 
-Annotated before/after transcripts in [`examples/`](examples/) are proof that each skill changes what the agent says and does.
+Annotated before/after transcripts in the `examples/` directory show how the skills change what the agent says and does.
 
 ## Suggested combos
 
-These are optional habits, not a required workflow. The skills stay independent.
+These are optional habits, not a required workflow.
 
-**`/pitch`**
-
-Before building, clamp the work to what was asked.
-
-**`/challenge` then `/prove-it`**
-
-Attack the idea, then demand evidence on what survived.
-
-**`/senpai`**
-
-After a non-trivial change, once the work is in, learn the pattern before moving on.
-
-**`/scrub`**
-
-After a messy agent turn, strip leftover fingerprints without redesigning the work.
-
-**`/drift`**
-
-After a big session or multi-file change, catch where the repo started disagreeing with itself.
-
-**`/chirp`**
-
-After a dense explanation, including a long `/senpai`, restate it more simply.
+- **`/pitch`** before building to clamp scope.
+- **`/challenge` then `/prove-it`** to attack the idea and then demand evidence.
+- **`/senpai`** after non-trivial work to learn the pattern.
+- **`/scrub`** after a messy agent turn to remove residue without redesign.
+- **`/drift`** after broad changes to catch contradictions.
+- **`/chirp`** after a dense explanation to restate it simply.
 
 ## Philosophy
 
 Start with the smallest instruction that reliably changes behavior.
 
-A skill should have one clear job.
+A Cricket command should have one clear job. The core defines meaning; adapters translate that meaning into each platform. Platform quirks should not leak into the core unless they reveal a real behavioral requirement.
 
-Add complexity only when real use proves that it is needed.
+Add complexity only when real use proves it is needed.
 
 ## Status
 
 Cricket Mode is early and experimental.
 
-The current skills are being tested through real AI-assisted development workflows and will change as useful failure cases show up.
+| Piece | Status |
+| --- | --- |
+| Seven current skills | Working reference implementation |
+| Platform-neutral command contract | Scaffolded |
+| Portable architecture documentation | Scaffolded |
+| Codex adapter | Planned / scaffold only |
+| Cursor adapter | Planned / scaffold only |
+| Antigravity adapter | Planned / scaffold only |
+| One-command installer | Planned |
 
 ## License
 
