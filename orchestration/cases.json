@@ -447,16 +447,43 @@
       ]
     },
     "expect": {
-      "lane": "DEEP",
+      "lane": "STANDARD",
       "decision": "COMPLETE",
       "model": null,
       "verified_completion": true,
       "unresolved_failures": [],
-      "recommendations": [
-        "challenge"
-      ],
+      "recommendations": [],
       "max_attempts": 2,
       "unrelated_failures": []
+    }
+  },
+  {
+    "name": "loremaster-chat-session-trim",
+    "task": {
+      "summary": "Treat a whitespace-only assistant reply as unfinished when trimming the chat session.",
+      "expected_files": 2,
+      "changed_files": [
+        "src/bot.py",
+        "tests/test_bot_regressions.py"
+      ],
+      "attempt": 1,
+      "checks": [
+        {
+          "name": "pytest tests/test_bot_regressions.py::test_blank_assistant_reply_does_not_split_chat_session",
+          "status": "PASSED",
+          "relation": "RELATED"
+        }
+      ]
+    },
+    "expect": {
+      "lane": "STANDARD",
+      "decision": "COMPLETE",
+      "model": null,
+      "verified_completion": true,
+      "unresolved_failures": [],
+      "unrelated_failures": [],
+      "recommendations": [],
+      "max_attempts": 2
     }
   },
   {

@@ -11,10 +11,9 @@ from pathlib import Path
 
 MAX_ATTEMPTS = 2
 
-# Word boundaries so "author" is not "auth". "session" and "architecture"
-# are intentionally broad; that over-calls DEEP and stays that way until a
-# real task shows it is wrong.
-_DEEP = re.compile(r"\b(auth|session|architecture)\b", re.IGNORECASE)
+# Word boundaries so "author" is not "auth". "architecture" still marks DEEP.
+# "session" does not: a chat-history trim was classified DEEP from that word alone.
+_DEEP = re.compile(r"\b(auth|architecture)\b", re.IGNORECASE)
 _RELATIONS = ("RELATED", "UNRELATED", "UNKNOWN")
 
 

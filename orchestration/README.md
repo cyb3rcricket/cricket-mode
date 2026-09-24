@@ -37,7 +37,7 @@ python3 orchestration/check.py
 ## Known limitations
 
 - The caller must increment `attempt`. Sending `1` again returns `RETRY` again.
-- The words `session` and `architecture` mark the lane `DEEP`, even when the task is ordinary.
+- The word `architecture` marks the lane `DEEP`, even when the task is ordinary. The word `session` does not.
 - Blast radius is invisible unless `expected_files` is set.
 - Exactly twice the expected file count does not escalate. More than twice does.
 - `COMPLETE` with `verified_completion: false` means no applicable check was reported passed. It does not mean the tests passed.

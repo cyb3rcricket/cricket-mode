@@ -150,7 +150,7 @@ Codex and Antigravity both use `.agents/skills`. This repository keeps its refer
 
 Recommendations may name `prove-it`, `challenge`, or `drift`, and at most two of them. Nothing is invoked. `pitch`, `chirp`, `senpai`, and `scrub` stay explicit. The installer still copies only the seven commands. `core/COMMANDS.md` does not mention lanes.
 
-Known limits, left in place: the caller must increment `attempt`; the words `session` and `architecture` mark a lane `DEEP`; blast radius needs `expected_files`; exactly twice the expected count does not escalate; `COMPLETE` with `verified_completion: false` is not a passed test; this layer has not been run inside a host.
+Known limits, left in place: the caller must increment `attempt`; the word `architecture` marks a lane `DEEP`; blast radius needs `expected_files`; exactly twice the expected count does not escalate; `COMPLETE` with `verified_completion: false` is not a passed test; this layer has not been run inside a host.
 
 ## Guardrails for Future Us
 
@@ -189,7 +189,7 @@ Phase 6 policy is in `orchestration/`. Model routing, autonomous loops, and Phas
 
 Portable v1 is complete. The optional policy is in `orchestration/`. Do not start Phase 7 from this reconstruction.
 
-Next action is one real task through `decide` with that project's check results, to see whether `session` or `architecture` over-calls `DEEP`. Do not add a rule before that.
+`session` is no longer a `DEEP` token. `architecture` still is. Do not start Phase 7 from this note.
 
 The central question is:
 
