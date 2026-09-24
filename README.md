@@ -68,9 +68,10 @@ cricket-mode/
 │   └── COMMANDS.md           # platform-neutral behavior contract
 ├── adapters/
 │   ├── README.md             # adapter contract
-│   ├── codex/README.md
-│   ├── cursor/README.md
+│   ├── codex/                # Codex skills invoked as $name
+│   ├── cursor/               # Cursor skills wired to core/COMMANDS.md
 │   └── antigravity/README.md
+├── conformance/              # shared reply checks for the seven commands
 ├── docs/
 │   └── PORTABLE-CRICKET.md   # architecture + resume plan
 ├── AGENTS.md
@@ -83,7 +84,7 @@ The currently working reference skills live in `.agents/skills/`.
 
 Copy any skill you want into an agent environment that supports the current skill format. You can install only the skills you want.
 
-**Important:** the Codex, Cursor, and Antigravity adapter directories are currently scaffolds, not finished installers. Cross-agent installation is the next phase.
+**Important:** the Cursor and Codex adapters are implemented. Install notes are in `adapters/cursor/README.md` and `adapters/codex/README.md`. Shared reply checks are in `conformance/`. Antigravity is still a scaffold. There is no one-command installer yet.
 
 ## Usage
 
@@ -131,10 +132,11 @@ Cricket Mode is early and experimental.
 | Piece | Status |
 | --- | --- |
 | Seven current skills | Working reference implementation |
-| Platform-neutral command contract | Scaffolded |
+| Platform-neutral command contract | Reviewed against the reference skills and existing examples |
 | Portable architecture documentation | Scaffolded |
-| Codex adapter | Planned / scaffold only |
-| Cursor adapter | Planned / scaffold only |
+| Codex adapter | Implemented. Skills invoked as `$name`, wired to the core contract |
+| Cursor adapter | Implemented. Explicit skills wired to the core contract |
+| Shared conformance checks | Seven command cases in `conformance/` |
 | Antigravity adapter | Planned / scaffold only |
 | One-command installer | Planned |
 

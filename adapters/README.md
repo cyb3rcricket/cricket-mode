@@ -8,13 +8,13 @@ An adapter may handle where instructions live, how commands are discovered/invok
 
 An adapter may **not** quietly change the meaning of a command.
 
-The behavioral source of truth is `../core/COMMANDS.md`.
+The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are `../conformance/`. Adapters call that module instead of copying the cases.
 
 ## Current targets
 
-- `codex/`
-- `cursor/`
-- `antigravity/`
+- `codex/` — implemented
+- `cursor/` — implemented
+- `antigravity/` — scaffold
 
 More adapters can be added later without changing the portable core.
 

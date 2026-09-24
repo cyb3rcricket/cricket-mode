@@ -68,11 +68,15 @@ Should we retry?       → agent judgment may help
 
 ### Portable contract
 
-`core/COMMANDS.md` is the new neutral specification for what the seven commands mean.
+`core/COMMANDS.md` is the neutral specification for what the seven commands mean. It has been reviewed against `.agents/skills/` and the transcripts in `examples/`.
 
-### Adapter skeleton
+### Adapters
 
-`adapters/codex/`, `adapters/cursor/`, and `adapters/antigravity/` are **implementation placeholders**, not finished support.
+`adapters/cursor/` and `adapters/codex/` expose the seven commands through each host's skill mechanism. Both read `core/COMMANDS.md`. `adapters/antigravity/` is still an implementation placeholder.
+
+### Conformance
+
+`conformance/` checks a reply against one shared case per command. Adapters call it. It does not call a model.
 
 ## Deliberately not built yet
 
@@ -83,7 +87,6 @@ Do not assume these exist just because the scaffold exists:
 - automatic Antigravity installation,
 - a universal command registry,
 - a one-command installer,
-- adapter conformance tests,
 - model routing,
 - Luna/Sol escalation,
 - Jev integration,
@@ -93,29 +96,27 @@ First make the existing seven behaviors portable. Then decide which orchestratio
 
 ## Implementation plan
 
-### Phase 1 — confirm the contract
+### Phase 1 — confirm the contract (done)
 
-Review `core/COMMANDS.md` against the existing skill files and examples. Make sure the neutral wording preserves the behavior already wanted.
+Reviewed `core/COMMANDS.md` against `.agents/skills/*/SKILL.md` and the transcripts in `examples/`. The contract now keeps the behaviors those sources already require, including the pitch stated before edits, chirp restating the previous reply, senpai teaching the mechanism, challenge separating findings from uninspected code, prove-it running the real behavior, and scrub closing with Residue, Keep, and Out of scope.
 
-### Phase 2 — build one adapter end to end
+`examples/` has transcripts for `/chirp`, `/senpai`, `/challenge`, `/prove-it`, and `/drift`. `/pitch` and `/scrub` were checked against their skill files only. The reference skills were not rewritten.
 
-Pick **one** environment. Do not build all three simultaneously.
+### Phase 2 — build one adapter end to end (done)
 
-Deliver: installation instructions, seven exposed behaviors, and no semantic fork from the core.
+Chose Cursor. The other adapters were left for later.
 
-### Phase 3 — conformance tests
+`adapters/cursor/` exposes all seven commands as Cursor Agent Skills. Each `SKILL.md` is wiring: it points at one shared contract file, which links to `core/COMMANDS.md`. Install steps, invocation, and limitations are in `adapters/cursor/README.md`. `adapters/cursor/check.py` installs that tree into a temporary project's `.cursor/skills/` and checks discovery plus the contract link.
 
-Create a small shared behavior matrix.
+### Phase 3 — conformance tests (done)
 
-Examples:
-- Did `/pitch` state non-goals before implementation?
-- Did `/challenge` separate findings from possibilities?
-- Did `/prove-it` execute behavior instead of merely reading code?
-- Did `/scrub` avoid becoming a redesign?
+`conformance/` is the shared behavior matrix. One case per command supplies the fixture. `conformance/check.py` encodes the contract checks once. `python3 conformance/check.py` scores the bundled pass and fail replies. A later adapter imports `evaluate` instead of copying the rules. The checker does not call a model. The Codex adapter check runs this suite. Antigravity does not yet.
 
 ### Phase 4 — second and third adapters
 
-Use the first working adapter to define the repeatable adapter pattern, then implement the others.
+**Codex (done).** `adapters/codex/` exposes the seven commands as Codex skills invoked with `$name`, not as `/name` slash commands. Each skill points at one shared contract file. `agents/openai.yaml` sets `allow_implicit_invocation: false`. Install steps and limitations are in `adapters/codex/README.md`. `adapters/codex/check.py` installs that tree into a temporary project's `.agents/skills/` and runs `conformance/check.py`.
+
+**Antigravity:** not started.
 
 ### Phase 5 — installation/update tooling
 
@@ -146,9 +147,9 @@ Those should sit above or beside Cricket commands rather than silently redefinin
 
 ## Definition of portable-v1
 
-- [ ] seven-command core contract reviewed
-- [ ] Codex adapter working
-- [ ] Cursor adapter working
+- [x] seven-command core contract reviewed
+- [x] Codex adapter working
+- [x] Cursor adapter working
 - [ ] Antigravity adapter working
 - [ ] install instructions for each
 - [ ] same basic conformance checks across adapters
@@ -159,14 +160,11 @@ A one-command installer is useful but not required for portable-v1.
 
 ## If we get sidetracked, resume here
 
+Codex is complete. Resume at the Antigravity half of Phase 4. Reuse the Cursor and Codex adapters as patterns and `conformance/` as the shared cases. Leave the installer for Phase 5.
+
 1. Read this file.
-2. Read `core/COMMANDS.md`.
-3. Inspect `.agents/skills/`.
-4. Pick exactly one adapter.
-5. Implement one command end-to-end.
-6. Test it against the core contract.
-7. Repeat for the other six.
-8. Only then generalize installation or build the next adapter.
+2. Read `core/COMMANDS.md`, `adapters/codex/README.md`, and `conformance/README.md`.
+3. Implement the Antigravity adapter. Do not mark it done until its own check passes.
 
 The central question is:
 
