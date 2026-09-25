@@ -1,6 +1,6 @@
 # Cricket Mode agent guidance
 
-Cricket Mode is a portable set of small, opt-in behaviors for AI-assisted software development.
+Cricket Mode is a lightweight, portable behavior layer for coding agents: a set of small, opt-in commands that help clamp scope, challenge assumptions, verify work, explain changes, and clean up without imposing a required workflow.
 
 ## Project rule
 

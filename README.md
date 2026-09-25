@@ -1,38 +1,44 @@
-# 🦗 Cricket Mode!
+<!-- GitHub repo description: Portable commands for coding agents on Cursor, Codex, and Antigravity: clamp scope, challenge the work, prove it, then clean up. -->
 
-Small, focused agent behaviors for working better with coding agents.
+# 🦗 Cricket Mode
 
-Cricket Mode adds command-sized behaviors for common moments in AI-assisted development: simplify an explanation, teach the code that was just written, challenge an implementation, prove that something actually works, find where a project has drifted out of sync, scrub leftover agent fingerprints, or clamp scope to the asked-for change before you build.
+Cricket Mode is a lightweight behavior layer for AI coding agents.
 
-Each behavior does one thing.
+Instead of letting an agent jump straight from prompt to code, it gives you a disciplined way to decide how much effort a task deserves, control scope, challenge assumptions, verify the result, explain the work, and clean up what does not belong.
 
-## Skills
+It is not a replacement for Codex, Gemini, Grok, Claude, or any other coding agent. It is a portable set of commands, skills, and adapters that brings the same small behaviors to Cursor, Codex, and Antigravity.
+
+Use the smallest amount of intelligence necessary, and don’t call the work finished without evidence. The commands are independently useful. When a task benefits from a fuller pass, you can use the optional `plan → build → challenge → verify → explain → clean up` loop.
+
+The goal is not to make agents do more. It’s to make them waste less, think at the right depth, and leave behind work you can actually trust.
+
+## What you get
 
 | Command | What it does |
 | --- | --- |
-| `/chirp` | Makes the last explanation simpler, shorter, and easier to understand. |
-| `/senpai` | Teaches you what the agent just built, how it works, why it was done that way, and the reusable pattern behind it. |
-| `/challenge` | Tries to break the work before you trust it. |
-| `/prove-it` | Verifies real behavior and shows evidence instead of merely claiming the work is correct. |
-| `/drift` | Finds places where the project no longer agrees with itself. |
-| `/scrub` | Finds leftover agent fingerprints and proposes surgical removal. |
-| `/pitch` | Clamps the work to the smallest change that solves the stated problem before coding begins. |
+| `/pitch` | Clamp scope before coding. |
+| `/challenge` | Try to break completed work. |
+| `/prove-it` | Verify real behavior with evidence. |
+| `/senpai` | Learn the work that was just built. |
+| `/scrub` | Remove agent residue without redesigning. |
+| `/drift` | Find where the project disagrees with itself. |
+| `/chirp` | Make the last explanation clearer. |
 
-## Why Cricket Mode?
+## Install
 
-Coding agents produce a lot of work quickly. That creates recurring problems: dense explanations, code you did not learn from, plausible bugs, weak verification, repository drift, AI residue, and agents inventing scope that was never requested.
+From this checkout, install one adapter into a project:
 
-Cricket Mode gives each moment a small, explicit command.
-
-```text
-/chirp      Make the last answer click.
-/senpai     Teach me what you just built.
-/challenge  Try to break it before we trust it.
-/prove-it   Don't tell me it works. Prove it.
-/drift      Find where the project disagrees with itself.
-/scrub      Strip the agent fingerprints. Don't redesign the work.
-/pitch      Solve only what was asked. Ask before inventing.
+```bash
+python3 cricket install cursor|codex|antigravity --target /path/to/project
 ```
+
+Replace `cursor|codex|antigravity` with one supported host name. Cursor uses `.cursor/skills/`; Codex and Antigravity use `.agents/skills/`. The reference skill source in this checkout is `.agents/skills/<command>/`; copy a command from there into a compatible agent environment. Run `python3 cricket update --target /path/to/project` to refresh an installed contract copy.
+
+Supported hosts are Cursor, Codex, and Antigravity.
+
+## What it is not
+
+Cricket Mode is not a coding agent or a required workflow. It is opt-in: use commands independently, and combine them only when a task benefits from the combination.
 
 ## Portable by design
 
@@ -56,7 +62,7 @@ The goal is **behavioral portability, not identical plumbing**.
 
 The `.agents/skills/` directory remains the reference implementation. Portable adapters are in `adapters/`.
 
-See **[Portable Cricket](docs/PORTABLE-CRICKET.md)** for the architecture, current status, and exact continuation plan. It is intentionally written so the project can be resumed after a long break without reconstructing the idea from chat history.
+See **[Portable Cricket](docs/PORTABLE-CRICKET.md)** for the architecture and detailed status.
 
 ## Repository layout
 
@@ -74,19 +80,11 @@ cricket-mode/
 ├── conformance/              # shared reply checks for the seven commands
 ├── orchestration/            # optional task policy; not installed with an adapter
 ├── docs/
-│   └── PORTABLE-CRICKET.md   # architecture + resume plan
+│   └── PORTABLE-CRICKET.md   # architecture + detailed status
 ├── cricket                   # install or update one adapter
 ├── AGENTS.md
 └── examples/
 ```
-
-## Installation today
-
-The currently working reference skills live in `.agents/skills/`.
-
-Copy any skill you want into an agent environment that supports the current skill format. You can install only the skills you want.
-
-**Important:** Portable v1 is complete. From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. `python3 cricket update --target /path/to/project` refreshes an installed contract copy. Install notes and the live-session records are in each adapter README. Shared reply checks are in `conformance/`. The adapter scripts still do not open the host applications. The live sessions are recorded separately below.
 
 ## Usage
 
@@ -135,20 +133,20 @@ Three labels are kept apart:
 
 - **IMPLEMENTED** — the files exist in this repository.
 - **DETERMINISTICALLY VERIFIED** — a script in this repository exercised that behavior. The script does not open the host application.
-- **LIVE VALIDATED** — the named host was run, and the session matched the notes below.
+- **LIVE VALIDATED** — the named host was run and the stated behavior was observed.
 
-Portable v1 is complete. Phase 6 is an optional policy in `orchestration/`. It does not select a model, it does not invoke a Cricket command, and it is not part of adapter install. It has not been run inside a host app.
+Portable v1 is complete. Orchestration is an optional policy beside the commands; it does not select a model or invoke a Cricket command, is not installed with an adapter, has not been live validated in a host app, and does not automatically classify tasks or escalate work.
 
 | Piece | Status |
 | --- | --- |
 | Seven reference skills | IMPLEMENTED in `.agents/skills/` |
 | Command contract | IMPLEMENTED. Reviewed against the reference skills and the existing examples |
-| Codex adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/codex/check.py`. LIVE VALIDATED: `$pitch` loaded the skill and contract, stated Ask / Smallest plan / Won't do before editing, a normal prompt did not auto-trigger Cricket, and `$prove-it` verified the filesystem and ended **PASS** |
-| Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py`. LIVE VALIDATED: `/pitch` loaded the skill and contract, stated Ask / Smallest plan / Won't do before editing, a normal prompt did not auto-trigger the skill, and `/prove-it` verified execution and files and ended **PASS** |
-| Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py`. LIVE VALIDATED: `/pitch` loaded the installed skill and contract, stated Ask / Smallest plan / Won't do, and wrote the requested file. A normal prompt did not invoke any Cricket skill. `/prove-it` verified filesystem, content, and bytes and ended **PASS**. That `/pitch` run also surfaced `challenge` as a used skill |
+| Codex adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/codex/check.py`. LIVE VALIDATED for explicit `$pitch` and `$prove-it`; a normal prompt did not auto-trigger Cricket |
+| Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py`. LIVE VALIDATED for explicit `/pitch` and `/prove-it`; a normal prompt did not auto-trigger Cricket |
+| Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py`. LIVE VALIDATED for explicit `/pitch` and `/prove-it`; a normal prompt did not invoke Cricket, and one `/pitch` run also surfaced `challenge` |
 | Shared conformance checks | DETERMINISTICALLY VERIFIED by `python3 conformance/check.py` and by each adapter check |
 | Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test`. Install and update tooling is complete. It still copies only the seven commands |
-| Orchestration | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 orchestration/check.py`. Optional. Not live validated in a host |
+| Orchestration | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 orchestration/check.py`. Optional policy beside the commands |
 
 ## License
 
