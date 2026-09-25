@@ -88,7 +88,7 @@ Do not assume these exist:
 - Jev integration,
 - autonomous retry loops.
 
-The seven behaviors have adapters, an installer, and recorded live sessions. Phase 6 has not been started.
+The seven behaviors have adapters, an installer, and recorded live sessions. `orchestration/` is an optional policy beside those commands. It does not route models, and it does not retry on its own.
 
 ## Implementation plan
 
@@ -146,9 +146,15 @@ Codex and Antigravity both use `.agents/skills`. This repository keeps its refer
 
 ### Phase 6 — optional orchestration
 
-After portability works, separately explore model routing, deterministic verification loops, retry/escalation, or other higher-level orchestration.
+`orchestration/policy.py` is a pure function. The caller supplies the summary, `expected_files`, `changed_files`, `attempt`, and check results. A result dict comes out. `decide` does not read the repo, store attempts, run checks, invoke Cricket, or select a model. `model` is always null. There is no vendor model mapping. `max_attempts` is 2. There is no loop inside `decide`.
 
-Those should sit above or beside Cricket commands rather than silently redefining them.
+Lanes, in order: `ESCALATE` when more than twice the expected files changed; otherwise `DEEP` only for the whole word `auth`; otherwise `FAST` for at most one changed file; otherwise `STANDARD`. `session` and `architecture` do not select a lane.
+
+`FAILED` with `RELATED`, `UNKNOWN`, or no relation is a task failure. `FAILED` with `UNRELATED` stays visible and does not retry or escalate. Decision order: more than twice the expected file count is `ESCALATE`; otherwise a task failure is `RETRY` on attempt 1 and `ESCALATE` after that; otherwise `NOT RUN` is `BLOCKED`; otherwise `COMPLETE`.
+
+`COMPLETE` is not a `/prove-it` PASS. `verified_completion` is true only when a check was reported `PASSED` and no related or unknown check failed. Recommendations may name `prove-it`, `challenge`, or `drift`, at most two, and nothing is invoked. A `COMPLETE` task that is not `DEEP` recommends nothing. `pitch`, `chirp`, `senpai`, and `scrub` stay explicit. The installer still copies only the seven commands. `core/COMMANDS.md` does not mention lanes. Details and the call example are in `orchestration/README.md`.
+
+Known limits, left in place: the caller must increment `attempt`, and a missing attempt or `0` is treated as 1; a passing `auth` task still recommends `challenge`; blast radius needs `expected_files`; exactly twice the expected count does not escalate; `COMPLETE` with `verified_completion: false` is not a passed test; this layer has not been run inside a host.
 
 ## Guardrails for Future Us
 
@@ -181,13 +187,13 @@ Portable v1 is complete.
 - **DONE** — platform limitations documented in each adapter README, including the Antigravity `/pitch` observation.
 - **DONE** — README does not call the adapters scaffolds.
 
-Phase 6 has not been started.
+Phase 6 policy is in `orchestration/`. Model routing, autonomous loops, and Phase 7 are not started.
 
 ## If we get sidetracked, resume here
 
-Portable v1 is complete. Do not start Phase 6 from this closeout.
+Portable v1 is complete. The optional policy is in `orchestration/`. Do not start Phase 7 from this reconstruction.
 
-Leave model routing and the other Phase 6 ideas alone.
+`session` and `architecture` are not `DEEP` tokens. `auth` still is. Do not start Phase 7 from this note.
 
 The central question is:
 

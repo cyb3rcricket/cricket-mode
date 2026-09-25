@@ -72,6 +72,7 @@ cricket-mode/
 │   ├── cursor/               # Cursor skills wired to core/COMMANDS.md
 │   └── antigravity/          # Antigravity skills invoked as /name
 ├── conformance/              # shared reply checks for the seven commands
+├── orchestration/            # optional task policy; not installed with an adapter
 ├── docs/
 │   └── PORTABLE-CRICKET.md   # architecture + resume plan
 ├── cricket                   # install or update one adapter
@@ -136,7 +137,7 @@ Three labels are kept apart:
 - **DETERMINISTICALLY VERIFIED** — a script in this repository exercised that behavior. The script does not open the host application.
 - **LIVE VALIDATED** — the named host was run, and the session matched the notes below.
 
-Portable v1 is complete. Phase 6 has not been started.
+Portable v1 is complete. Phase 6 is an optional policy in `orchestration/`. It does not select a model, it does not invoke a Cricket command, and it is not part of adapter install. It has not been run inside a host app.
 
 | Piece | Status |
 | --- | --- |
@@ -146,7 +147,8 @@ Portable v1 is complete. Phase 6 has not been started.
 | Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py`. LIVE VALIDATED: `/pitch` loaded the skill and contract, stated Ask / Smallest plan / Won't do before editing, a normal prompt did not auto-trigger the skill, and `/prove-it` verified execution and files and ended **PASS** |
 | Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py`. LIVE VALIDATED: `/pitch` loaded the installed skill and contract, stated Ask / Smallest plan / Won't do, and wrote the requested file. A normal prompt did not invoke any Cricket skill. `/prove-it` verified filesystem, content, and bytes and ended **PASS**. That `/pitch` run also surfaced `challenge` as a used skill |
 | Shared conformance checks | DETERMINISTICALLY VERIFIED by `python3 conformance/check.py` and by each adapter check |
-| Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test`. Install and update tooling is complete |
+| Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test`. Install and update tooling is complete. It still copies only the seven commands |
+| Orchestration | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 orchestration/check.py`. Optional. Not live validated in a host |
 
 ## License
 

@@ -14,6 +14,7 @@ writes that file.
 from __future__ import annotations
 
 import filecmp
+import os
 import shutil
 import subprocess
 import sys
@@ -180,6 +181,9 @@ def run_tests() -> int:
         if not ok:
             failures.append(name)
 
+    def same_path(left: Path, right: Path) -> bool:
+        return os.path.realpath(left) == os.path.realpath(right)
+
     with tempfile.TemporaryDirectory(prefix="cricket-install-") as tmp:
         base = Path(tmp)
 
@@ -242,7 +246,32 @@ def run_tests() -> int:
         stale = cursor_contract.read_text()
         cursor_contract.write_text("stale contract\n")
         updated = update(cursor_project)
-        check("update-restores", filecmp.cmp(cursor_contract, CORE, shallow=False) and cursor_contract in updated and stale != "stale contract\n")
+        check(
+            "update-restores",
+            filecmp.cmp(cursor_contract, CORE, shallow=False)
+            and any(same_path(cursor_contract, path) for path in updated)
+            and stale != "stale contract\n",
+        )
+
+        real_root = base / "real-root"
+        real_root.mkdir()
+        link_root = base / "link-root"
+        link_root.symlink_to(real_root)
+        via_link = link_root / "cursor"
+        via_link.mkdir()
+        install("cursor", via_link)
+        linked_contract = via_link / ".cursor/skills/cricket-contract/COMMANDS.md"
+        linked_before = linked_contract.read_text()
+        linked_contract.write_text("stale contract\n")
+        linked_updated = update(via_link)
+        check(
+            "update-restores-through-symlink",
+            filecmp.cmp(linked_contract, CORE, shallow=False)
+            and linked_contract not in linked_updated
+            and any(same_path(linked_contract, path) for path in linked_updated)
+            and linked_contract.read_text() != "stale contract\n"
+            and linked_before != "stale contract\n",
+        )
 
         cli = subprocess.run(
             [sys.executable, str(ROOT / "cricket"), "install", "antigravity", "--target", str(base / "anti")],
