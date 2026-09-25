@@ -32,9 +32,13 @@ From this checkout, install one adapter into a project:
 python3 cricket install cursor|codex|antigravity --target /path/to/project
 ```
 
-Replace `cursor|codex|antigravity` with one supported host name. Cursor uses `.cursor/skills/`; Codex and Antigravity use `.agents/skills/`. The reference skill source in this checkout is `.agents/skills/<command>/`; copy a command from there into a compatible agent environment. Run `python3 cricket update --target /path/to/project` to refresh an installed contract copy.
+Replace `cursor|codex|antigravity` with one host. Supported hosts are Cursor, Codex, and Antigravity.
 
-Supported hosts are Cursor, Codex, and Antigravity.
+## Manual / update
+
+- Cursor installs into `.cursor/skills/`; Codex and Antigravity install into `.agents/skills/`.
+- The reference skill source in this checkout is `.agents/skills/<command>/`. You can copy a single command from there into a compatible agent environment.
+- `python3 cricket update --target /path/to/project` refreshes an installed contract copy.
 
 ## What it is not
 
