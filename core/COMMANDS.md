@@ -1,6 +1,6 @@
 # Cricket Mode command contract
 
-This is the platform-neutral behavioral contract for the seven current Cricket commands.
+This is the platform-neutral behavioral contract for the seven current Cricket commands, plus the optional `/yolo` sequencer.
 
 ## `/pitch`
 
@@ -94,6 +94,47 @@ Prefer editing existing code over adding new files or layers when that solves th
 
 **Core rule:** **Strip the agent fingerprints. Don't redesign the work.**
 
+## `/yolo`
+
+**Purpose:** run one complete Cricket pass over a single asked-for task, then stop.
+
+The name is a joke. The gates are not.
+
+**Must, in order:**
+
+1. Run `/pitch`. Do not edit until Ask / Smallest plan / Won't do is stated.
+2. Implement only that plan.
+3. Run `/challenge` on the work just built. Do not fix findings unless the user asks.
+4. Run `/prove-it` on the changed behavior. Close with exactly one of PASS, FAIL, or PARTIAL plus evidence.
+5. If PASS, run `/senpai`, then `/scrub`.
+6. Stop. Later turns are normal turns. `/yolo` does not stay on.
+
+**Stops immediately when:**
+
+- the ask is too ambiguous to pitch. Ask, then wait.
+- `/challenge` finds a problem and the user has not said to fix it.
+- `/prove-it` returns FAIL.
+- the work starts to exceed the pitch. Ask before widening.
+
+A PARTIAL is not a PASS. Say what remains unverified. Do not continue into `/senpai` and `/scrub` as if the work shipped.
+
+**Must not:**
+
+- stay on after the pass
+- invent a playbook, model route, retry loop, or overnight machine
+- auto-fix during `/challenge`
+- treat PARTIAL as PASS
+- pull in `/drift` or `/chirp` unless asked
+- run this sequence on a normal prompt just because `/yolo` exists
+- skip a step and call the pass complete
+- use the name as permission to widen scope
+
+**Result:** finish with the last command's required close, then one line:
+
+**YOLO:** COMPLETE | STOPPED at `<step>` | BLOCKED (`why`)
+
+**Core rule:** **YOLO the sequence. Not the judgment.**
+
 ## Cross-command invariants
 
 1. Commands stay independent. A user can invoke one without the others.
@@ -104,3 +145,4 @@ Prefer editing existing code over adding new files or layers when that solves th
 6. Do not claim certainty unsupported by evidence.
 7. Platform adapters preserve these semantics rather than inventing new ones.
 8. Small commands are a feature. Portability must not turn Cricket Mode into a compulsory framework.
+9. `/yolo` is optional. It sequences existing commands for one pass and then stops. It does not make the other commands depend on it, and it does not stay on after the pass.
