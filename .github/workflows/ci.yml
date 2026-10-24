@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  ci:
+    name: Verification Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check Codex adapter
+        run: python3 adapters/codex/check.py
+
+      - name: Check Cursor adapter
+        run: python3 adapters/cursor/check.py
+
+      - name: Check Antigravity adapter
+        run: python3 adapters/antigravity/check.py
+
+      - name: Run shared conformance checks
+        run: python3 conformance/check.py
+
+      - name: Test the installer
+        run: python3 cricket test
+
+      - name: Check orchestration policy
+        run: python3 orchestration/check.py
