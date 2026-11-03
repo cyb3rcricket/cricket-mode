@@ -96,7 +96,7 @@ The seven behaviors have adapters, an installer, and recorded live sessions. `or
 
 Reviewed `core/COMMANDS.md` against `.agents/skills/*/SKILL.md` and the transcripts in `examples/`. The contract now keeps the behaviors those sources already require, including the pitch stated before edits, chirp restating the previous reply, senpai teaching the mechanism, challenge separating findings from uninspected code, prove-it running the real behavior, and scrub closing with Residue, Keep, and Out of scope.
 
-`examples/` has transcripts for `/chirp`, `/senpai`, `/challenge`, `/prove-it`, and `/drift`. `/pitch` and `/scrub` were checked against their skill files only. The reference skills were not rewritten.
+`examples/` has transcripts for all seven commands (`/pitch`, `/chirp`, `/senpai`, `/challenge`, `/prove-it`, `/drift`, and `/scrub`). The reference skills were not rewritten.
 
 ### Phase 2 — build one adapter end to end (done)
 

@@ -36,7 +36,15 @@ From a cricket-mode checkout, into a project that is not this repository:
 python3 cricket install antigravity --target /path/to/your/project
 ```
 
-The same copy by hand:
+On Windows (PowerShell), use `py` instead of `python3`:
+
+```powershell
+py cricket install antigravity --target \path\to\your\project
+```
+
+Use the installer rather than hand-copying. The hand-copy path has a symlink trap: `adapters/antigravity/skills/cricket-contract/COMMANDS.md` is a symlink to `core/COMMANDS.md`. On Windows, copying files by hand (via PowerShell or File Explorer) can follow that symlink and overwrite `core/COMMANDS.md` in your repository checkout, or fail if symlinks are restricted. The installer avoids this by safely unlinking the destination before copying the contract as a regular file.
+
+The same copy by hand (POSIX):
 
 ```bash
 TARGET=/path/to/your/project
@@ -48,9 +56,9 @@ cp core/COMMANDS.md "$TARGET/.agents/skills/cricket-contract/COMMANDS.md"
 
 Remove the copied symlink before copying the contract. Copying onto that symlink can follow it and overwrite `core/COMMANDS.md`.
 
-Do not install this tree onto the cricket-mode repo's `.agents/skills/`. That directory is the reference implementation. `python3 cricket install antigravity` refuses to replace an unstamped skill. Codex reads the same path, so one project can hold the Codex wrappers or these wrappers, not both.
+Do not install this tree onto the cricket-mode repo's `.agents/skills/`. That directory is the reference implementation. `python3 cricket install antigravity` (or `py cricket install antigravity` on Windows) refuses to replace an unstamped skill. Codex reads the same path, so one project can hold the Codex wrappers or these wrappers, not both.
 
-To pick up a newer contract, run `python3 cricket update --target /path/to/your/project`, or copy `core/COMMANDS.md` over `.agents/skills/cricket-contract/COMMANDS.md` again.
+To pick up a newer contract, run `python3 cricket update --target /path/to/your/project` (or `py cricket update --target \path\to\your\project` on Windows), or copy `core/COMMANDS.md` over `.agents/skills/cricket-contract/COMMANDS.md` again.
 
 ## Usage
 

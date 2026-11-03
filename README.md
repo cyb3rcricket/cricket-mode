@@ -34,11 +34,19 @@ python3 cricket install cursor|codex|antigravity --target /path/to/project
 
 Replace `cursor|codex|antigravity` with one host. Supported hosts are Cursor, Codex, and Antigravity.
 
+On Windows (PowerShell), use `py` instead of `python3`:
+
+```powershell
+py cricket install cursor|codex|antigravity --target \path\to\project
+```
+
+Prefer the installer over hand-copying: `cricket-contract/COMMANDS.md` is a symlink in the repository, and copying files by hand risks following the link and overwriting `core/COMMANDS.md`. The installer safely replaces the symlink with a regular file.
+
 ## Manual / update
 
 - Cursor installs into `.cursor/skills/`; Codex and Antigravity install into `.agents/skills/`.
 - The reference skill source in this checkout is `.agents/skills/<command>/`. You can copy a single command from there into a compatible agent environment.
-- `python3 cricket update --target /path/to/project` refreshes an installed contract copy.
+- `python3 cricket update --target /path/to/project` (or `py cricket update --target \path\to\project` on Windows) refreshes an installed contract copy.
 
 ## What it is not
 
