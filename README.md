@@ -6,7 +6,7 @@ Cricket Mode is a lightweight behavior layer for AI coding agents.
 
 Instead of letting an agent jump straight from prompt to code, it gives you a disciplined way to clamp scope, challenge assumptions, verify the result with evidence, explain the work, and clean up what does not belong.
 
-It is not a replacement for Codex, Gemini, Grok, Claude, or any other coding agent. It is a portable set of commands, skills, and adapters that brings the same small behaviors to Cursor, Codex, and Antigravity.
+It is not a replacement for Codex, Gemini, Grok, Claude, or any other coding agent. It is a portable set of commands, skills, and adapters that brings the same small behaviors to Cursor, Codex, Antigravity, and Claude Code.
 
 Use the smallest amount of intelligence necessary, and don’t call the work finished without evidence. The commands are independently useful. When a task benefits from a fuller pass, you can use the optional `plan → build → challenge → verify → explain → clean up` loop.
 
