@@ -12,8 +12,12 @@ concurrency:
 
 jobs:
   ci:
-    name: Verification Checks
-    runs-on: ubuntu-latest
+    name: Verification Checks (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout repository
@@ -25,19 +29,19 @@ jobs:
           python-version: '3.11'
 
       - name: Check Codex adapter
-        run: python3 adapters/codex/check.py
+        run: python adapters/codex/check.py
 
       - name: Check Cursor adapter
-        run: python3 adapters/cursor/check.py
+        run: python adapters/cursor/check.py
 
       - name: Check Antigravity adapter
-        run: python3 adapters/antigravity/check.py
+        run: python adapters/antigravity/check.py
 
       - name: Run shared conformance checks
-        run: python3 conformance/check.py
+        run: python conformance/check.py
 
       - name: Test the installer
-        run: python3 cricket test
+        run: python cricket test
 
       - name: Check orchestration policy
-        run: python3 orchestration/check.py
+        run: python orchestration/check.py
