@@ -89,6 +89,12 @@ def check_pitch(reply: str, case: dict) -> list[str]:
     after_ask = reply[ask:] if ask >= 0 else reply
     if any(phrase in after_ask for phrase in case["forbidden"]):
         failed.append("pitch.no_widen")
+    plan = _between(reply, "**Smallest plan:**", "**Won't do:**")
+    if plan is not None and any(
+        phrase.lower() in plan.lower() for phrase in case["wont_do"]
+    ):
+        if "pitch.no_widen" not in failed:
+            failed.append("pitch.no_widen")
     return failed
 
 
@@ -154,8 +160,13 @@ def check_prove_it(reply: str, case: dict) -> list[str]:
 
 def check_drift(reply: str, case: dict) -> list[str]:
     failed = []
-    if any(phrase not in reply for phrase in case["sides"]):
-        failed.append("drift.sides")
+    sentences = []
+    for line in reply.splitlines():
+        sentences.extend(re.split(r"(?<=[.!?])\s+", line))
+    for source, value in case["pairs"]:
+        if not any(source in sentence and value in sentence for sentence in sentences):
+            failed.append("drift.sides")
+            break
     return failed
 
 
