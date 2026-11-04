@@ -81,10 +81,28 @@ def expected_body(name: str) -> str:
 
 def install(source: Path, target_skills: Path, core: Path) -> None:
     target_skills.mkdir(parents=True)
-    subprocess.run(["cp", "-a", f"{source}/.", str(target_skills)], check=True)
+    try:
+        shutil.copytree(source, target_skills, dirs_exist_ok=True, symlinks=True)
+    except OSError:
+        shutil.copytree(source, target_skills, dirs_exist_ok=True, symlinks=False)
     materialized = target_skills / "cricket-contract" / "COMMANDS.md"
     materialized.unlink()
     shutil.copyfile(core, materialized)
+
+
+def is_contract_link(link: Path, core: Path) -> bool:
+    if link.is_symlink():
+        try:
+            return link.resolve() == core.resolve()
+        except OSError:
+            return False
+    if link.is_file():
+        try:
+            target = link.read_text().strip()
+            return bool(target) and (link.parent / target).resolve() == core.resolve()
+        except (OSError, ValueError):
+            return False
+    return False
 
 
 def main() -> int:
@@ -93,7 +111,7 @@ def main() -> int:
     core = root / "core" / "COMMANDS.md"
     link = source / "cricket-contract" / "COMMANDS.md"
     failures: list[str] = []
-    if not link.is_symlink() or link.resolve() != core.resolve():
+    if not is_contract_link(link, core):
         failures.append(f"{link} is not a symlink to core/COMMANDS.md")
 
     sys.path.insert(0, str(root))

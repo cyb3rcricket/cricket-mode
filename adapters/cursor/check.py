@@ -100,12 +100,30 @@ def section(contract: str, name: str) -> str:
 
 def install(source: Path, target_skills: Path) -> None:
     target_skills.mkdir(parents=True)
-    subprocess.run(["cp", "-a", f"{source}/.", str(target_skills)], check=True)
+    try:
+        shutil.copytree(source, target_skills, dirs_exist_ok=True, symlinks=True)
+    except OSError:
+        shutil.copytree(source, target_skills, dirs_exist_ok=True, symlinks=False)
     materialized = target_skills / "cricket-contract" / "COMMANDS.md"
     # Remove the copied symlink before writing. Copying onto it can follow
     # the link and overwrite core/COMMANDS.md.
     materialized.unlink()
     shutil.copyfile(repo_root() / "core" / "COMMANDS.md", materialized)
+
+
+def is_contract_link(link: Path, core: Path) -> bool:
+    if link.is_symlink():
+        try:
+            return link.resolve() == core.resolve()
+        except OSError:
+            return False
+    if link.is_file():
+        try:
+            target = link.read_text().strip()
+            return bool(target) and (link.parent / target).resolve() == core.resolve()
+        except (OSError, ValueError):
+            return False
+    return False
 
 
 def discover(skills_root: Path) -> dict[str, Path]:
@@ -123,10 +141,8 @@ def main() -> int:
     source = root / "adapters" / "cursor" / "skills"
     core = root / "core" / "COMMANDS.md"
     link = source / "cricket-contract" / "COMMANDS.md"
-    if not link.is_symlink():
+    if not is_contract_link(link, core):
         raise SystemExit(f"{link} is not a symlink to the core contract")
-    if not link.resolve() == core.resolve():
-        raise SystemExit(f"{link} resolves to {link.resolve()}, not {core}")
 
     failures: list[str] = []
     with tempfile.TemporaryDirectory(prefix="cricket-cursor-") as tmp:
