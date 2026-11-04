@@ -29,22 +29,22 @@ The goal is not to make agents do more. It’s to make them waste less, think at
 From this checkout, install one adapter into a project:
 
 ```bash
-python3 cricket install cursor|codex|antigravity --target /path/to/project
+python3 cricket install cursor|codex|antigravity|claude --target /path/to/project
 ```
 
-Replace `cursor|codex|antigravity` with one host. Supported hosts are Cursor, Codex, and Antigravity.
+Replace `cursor|codex|antigravity|claude` with one host. Supported hosts are Cursor, Codex, Antigravity, and Claude Code.
 
 On Windows (PowerShell), use `py` instead of `python3`:
 
 ```powershell
-py cricket install cursor|codex|antigravity --target \path\to\project
+py cricket install cursor|codex|antigravity|claude --target \path\to\project
 ```
 
 Prefer the installer over hand-copying: `cricket-contract/COMMANDS.md` is a symlink in the repository, and copying files by hand risks following the link and overwriting `core/COMMANDS.md`. The installer safely replaces the symlink with a regular file.
 
 ## Manual / update
 
-- Cursor installs into `.cursor/skills/`; Codex and Antigravity install into `.agents/skills/`.
+- Cursor installs into `.cursor/skills/`; Codex and Antigravity install into `.agents/skills/`; Claude Code installs into `.claude/skills/`.
 - The reference skill source in this checkout is `.agents/skills/<command>/`. You can copy a single command from there into a compatible agent environment.
 - `python3 cricket update --target /path/to/project` (or `py cricket update --target \path\to\project` on Windows) refreshes an installed contract copy.
 
@@ -88,7 +88,8 @@ cricket-mode/
 │   ├── README.md             # adapter contract
 │   ├── codex/                # Codex skills invoked as $name
 │   ├── cursor/               # Cursor skills wired to core/COMMANDS.md
-│   └── antigravity/          # Antigravity skills invoked as /name
+│   ├── antigravity/          # Antigravity skills invoked as /name
+│   └── claude/               # Claude Code skills invoked as /name
 ├── conformance/              # shared reply checks for the seven commands
 ├── orchestration/            # optional task policy; not installed with an adapter
 ├── docs/
@@ -156,6 +157,7 @@ Portable v1 is complete. Orchestration is an optional policy beside the commands
 | Codex adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/codex/check.py`. LIVE VALIDATED for explicit `$pitch` and `$prove-it`; a normal prompt did not auto-trigger Cricket |
 | Cursor adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/cursor/check.py`. LIVE VALIDATED for explicit `/pitch` and `/prove-it`; a normal prompt did not auto-trigger Cricket |
 | Antigravity adapter | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 adapters/antigravity/check.py`. LIVE VALIDATED for explicit `/pitch` and `/prove-it`; a normal prompt did not invoke Cricket, and one `/pitch` run also surfaced `challenge` |
+| Claude Code adapter | IMPLEMENTED. Deterministically verified by `adapters/claude/check.py`. Live validation pending |
 | Shared conformance checks | DETERMINISTICALLY VERIFIED by `python3 conformance/check.py` and by each adapter check |
 | Installer | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 cricket test`. Install and update tooling is complete. It still copies only the seven commands |
 | Orchestration | IMPLEMENTED. DETERMINISTICALLY VERIFIED by `python3 orchestration/check.py`. Optional policy beside the commands |

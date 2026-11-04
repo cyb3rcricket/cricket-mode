@@ -72,7 +72,7 @@ Should we retry?       → agent judgment may help
 
 ### Adapters
 
-`adapters/cursor/`, `adapters/codex/`, and `adapters/antigravity/` expose the seven commands through each host's skill mechanism. All three read `core/COMMANDS.md`. The adapter checks do not open the hosts. Live sessions for Cursor, Codex, and Antigravity are recorded below. Portable v1 is complete.
+`adapters/cursor/`, `adapters/codex/`, `adapters/antigravity/`, and `adapters/claude/` expose the seven commands through each host's skill mechanism. All four read `core/COMMANDS.md`. The adapter checks do not open the hosts. Live sessions for Cursor, Codex, and Antigravity are recorded below. Claude Code documents `disable-model-invocation`, so the no-auto-trigger rule is enforced in frontmatter, like Cursor's. The Claude Code adapter is deterministically checked, and live validation is pending. Portable v1 is complete.
 
 ### Conformance
 
@@ -122,6 +122,7 @@ Chose Cursor. The other adapters were left for later.
 python3 cricket install cursor --target /path/to/project
 python3 cricket install codex --target /path/to/project
 python3 cricket install antigravity --target /path/to/project
+python3 cricket install claude --target /path/to/project
 python3 cricket update --target /path/to/project
 python3 cricket test
 ```
@@ -133,14 +134,15 @@ python3 cricket test
 | cursor | `.cursor/skills/<command>/SKILL.md` and `.cursor/skills/cricket-contract/COMMANDS.md` |
 | codex | `.agents/skills/<command>/SKILL.md`, `.agents/skills/<command>/agents/openai.yaml`, and `.agents/skills/cricket-contract/COMMANDS.md` |
 | antigravity | `.agents/skills/<command>/SKILL.md` and `.agents/skills/cricket-contract/COMMANDS.md` |
+| claude | `.claude/skills/<command>/SKILL.md` and `.claude/skills/cricket-contract/COMMANDS.md` |
 
-`<command>` is `pitch`, `chirp`, `senpai`, `challenge`, `prove-it`, `drift`, and `scrub`. Each installed `SKILL.md` contains the line `Cricket adapter: cursor`, `Cricket adapter: codex`, or `Cricket adapter: antigravity`. That line is how the script tells an adapter install from a reference skill.
+`<command>` is `pitch`, `chirp`, `senpai`, `challenge`, `prove-it`, `drift`, and `scrub`. Each installed `SKILL.md` contains the line `Cricket adapter: cursor`, `Cricket adapter: codex`, `Cricket adapter: antigravity`, or `Cricket adapter: claude`. That line is how the script tells an adapter install from a reference skill.
 
 `update` replaces an installed `cricket-contract/COMMANDS.md` from `core/COMMANDS.md` when `pitch/SKILL.md` carries one of those lines. It does not replace skill files.
 
 A repeat install of the same adapter replaces that adapter's skill folders and writes the contract again. If `COMMANDS.md` is a symlink, the script unlinks it and writes a regular file. It does not copy through the link.
 
-Codex and Antigravity both use `.agents/skills`. This repository keeps its reference skills in that same directory. Those reference files are not stamped, and Codex and Antigravity stamps are different. The installer refuses the install when any of the seven skill paths is unstamped or stamped for the other host, and it writes nothing. It does not merge the two adapters, and it does not overwrite the reference skills. Install Codex or Antigravity into another project. Cursor writes `.cursor/skills`, so it can sit beside `.agents/skills`.
+Codex and Antigravity both use `.agents/skills`. This repository keeps its reference skills in that same directory. Those reference files are not stamped, and Codex and Antigravity stamps are different. The installer refuses the install when any of the seven skill paths is unstamped or stamped for the other host, and it writes nothing. It does not merge the two adapters, and it does not overwrite the reference skills. Install Codex or Antigravity into another project. Cursor writes `.cursor/skills` and Claude Code writes `.claude/skills`, so each can sit beside `.agents/skills`.
 
 `python3 cricket test` runs those cases in a temporary directory.
 

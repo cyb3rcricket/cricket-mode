@@ -2,7 +2,7 @@
 """Install one Cricket adapter, or refresh an installed contract copy.
 
 Usage:
-  python3 cricket install cursor|codex|antigravity [--target DIR]
+  python3 cricket install cursor|codex|antigravity|claude [--target DIR]
   python3 cricket update [--target DIR]
   python3 cricket test
 
@@ -32,16 +32,18 @@ COMMANDS = [
     "drift",
     "scrub",
 ]
-ADAPTERS = ("cursor", "codex", "antigravity")
+ADAPTERS = ("cursor", "codex", "antigravity", "claude")
 DEST = {
     "cursor": Path(".cursor/skills"),
     "codex": Path(".agents/skills"),
     "antigravity": Path(".agents/skills"),
+    "claude": Path(".claude/skills"),
 }
 STAMP = {
     "cursor": "Cricket adapter: cursor",
     "codex": "Cricket adapter: codex",
     "antigravity": "Cricket adapter: antigravity",
+    "claude": "Cricket adapter: claude",
 }
 
 
@@ -74,7 +76,7 @@ def write_contract(dest: Path) -> None:
 def install(platform: str, target: Path) -> list[Path]:
     if platform not in ADAPTERS:
         raise InstallError(
-            f"unknown adapter {platform!r}. Expected cursor, codex, or antigravity."
+            f"unknown adapter {platform!r}. Expected cursor, codex, antigravity, or claude."
         )
     target = target.resolve()
     source = ROOT / "adapters" / platform / "skills"
@@ -133,6 +135,11 @@ def update(target: Path) -> list[Path]:
         path = agents_root / "cricket-contract" / "COMMANDS.md"
         write_contract(path)
         updated.append(path)
+    claude_root = target / ".claude/skills"
+    if classify(claude_root / "pitch" / "SKILL.md") == "claude":
+        path = claude_root / "cricket-contract" / "COMMANDS.md"
+        write_contract(path)
+        updated.append(path)
     if not updated:
         raise InstallError(
             "no Cricket adapter install in "
@@ -153,7 +160,7 @@ def target_from(argv: list[str]) -> Path:
 
 def usage() -> str:
     return """usage:
-  python3 cricket install cursor|codex|antigravity [--target DIR]
+  python3 cricket install cursor|codex|antigravity|claude [--target DIR]
   python3 cricket update [--target DIR]
   python3 cricket test
 
@@ -166,6 +173,9 @@ codex writes .agents/skills/<command>/SKILL.md,
 
 antigravity writes .agents/skills/<command>/SKILL.md and
 .agents/skills/cricket-contract/COMMANDS.md.
+
+claude writes .claude/skills/<command>/SKILL.md and
+.claude/skills/cricket-contract/COMMANDS.md.
 
 update replaces those COMMANDS.md copies from core/COMMANDS.md.
 It does not replace skill files and does not edit core/COMMANDS.md.
@@ -197,6 +207,26 @@ def run_tests() -> int:
         check("cursor-leaves-agents", not (cursor_project / ".agents").exists())
         again = install("cursor", cursor_project)
         check("cursor-idempotent", [path.read_bytes() for path in written] == [path.read_bytes() for path in again])
+
+        claude_project = base / "claude"
+        claude_project.mkdir()
+        written_claude = install("claude", claude_project)
+        claude_skill = claude_project / ".claude/skills/pitch/SKILL.md"
+        claude_contract = claude_project / ".claude/skills/cricket-contract/COMMANDS.md"
+        check("claude-files", claude_skill.is_file() and "Cricket adapter: claude" in claude_skill.read_text())
+        check("claude-contract", claude_contract.is_file() and not claude_contract.is_symlink() and filecmp.cmp(claude_contract, CORE, shallow=False))
+        check("claude-leaves-agents", not (claude_project / ".agents").exists())
+        again_claude = install("claude", claude_project)
+        check("claude-idempotent", [path.read_bytes() for path in written_claude] == [path.read_bytes() for path in again_claude])
+        claude_stale = claude_contract.read_text()
+        claude_contract.write_text("stale contract\n")
+        claude_updated = update(claude_project)
+        check(
+            "claude-update-restores",
+            filecmp.cmp(claude_contract, CORE, shallow=False)
+            and any(same_path(claude_contract, path) for path in claude_updated)
+            and claude_stale != "stale contract\n",
+        )
 
         canary = base / "canary.md"
         canary.write_text("CANARY")
@@ -282,6 +312,15 @@ def run_tests() -> int:
         anti_skill = base / "anti" / ".agents/skills/pitch/SKILL.md"
         check("cli-antigravity", cli.returncode == 0 and anti_skill.is_file() and "Cricket adapter: antigravity" in anti_skill.read_text(), cli.stderr.strip())
 
+        cli_claude = subprocess.run(
+            [sys.executable, str(ROOT / "cricket"), "install", "claude", "--target", str(base / "claude-cli")],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+        claude_cli_skill = base / "claude-cli" / ".claude/skills/pitch/SKILL.md"
+        check("cli-claude", cli_claude.returncode == 0 and claude_cli_skill.is_file() and "Cricket adapter: claude" in claude_cli_skill.read_text(), cli_claude.stderr.strip())
+
         bad = subprocess.run(
             [sys.executable, str(ROOT / "cricket"), "install", "nope", "--target", str(base / "nope")],
             cwd=ROOT,
@@ -297,7 +336,7 @@ def run_tests() -> int:
             print(f"- {item}")
         return 1
     print("PASS")
-    print("installer tests passed for cursor, codex, and antigravity")
+    print("installer tests passed for cursor, codex, antigravity, and claude")
     return 0
 
 
