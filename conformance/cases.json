@@ -44,6 +44,11 @@
         "name": "pass-different-wording",
         "fail": [],
         "reply": "**Ask:** The only change is to rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename that function and the call sites that already sit in the same file.\n\n**Won't do:** helper module, retry wrapper.\n"
+      },
+      {
+        "name": "wont-do-in-plan",
+        "fail": ["pitch.no_widen"],
+        "reply": "**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file, and add a helper module to hold the renamed function.\n\n**Won't do:** helper module, retry wrapper.\n"
       }
     ]
   },
@@ -216,7 +221,7 @@
   {
     "command": "drift",
     "fixture": "Notifications worker. README, config, and consumer may disagree about retries.",
-    "sides": ["retried 5 times", "max_retries = 3"],
+    "pairs": [["README", "retried 5 times"], ["config/worker.toml", "max_retries = 3"]],
     "samples": [
       {
         "name": "pass",
@@ -242,6 +247,11 @@
         "name": "config-then-readme",
         "fail": [],
         "reply": "config/worker.toml sets max_retries = 3 and the worker reads that field, so current behavior is 3. README.md still says a failed send is retried 5 times. I did not change either file.\n"
+      },
+      {
+        "name": "swapped-sides",
+        "fail": ["drift.sides"],
+        "reply": "config/worker.toml says a failed send is retried 5 times. README.md sets max_retries = 3. Both files agree, so retries are consistent.\n"
       }
     ]
   },

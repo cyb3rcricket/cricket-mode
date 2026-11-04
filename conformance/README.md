@@ -47,3 +47,7 @@ A live adapter has to produce the reply. This layer does not call a model, score
 | `/prove-it` | `proveit.status`, `proveit.evidence` |
 | `/drift` | `drift.sides` |
 | `/scrub` | `scrub.closes`, `scrub.concrete`, `scrub.surgical`, `scrub.no_redesign`, `scrub.separated` |
+
+`drift.sides` checks that each value is paired with its source in the same sentence, not just that both values are present.
+
+`pitch.no_widen` also fires when a wont-do item appears in the plan section. A plan that negates a wont-do item ("no helper module") trips this rule too.
