@@ -39,6 +39,11 @@
         "name": "prose-widen",
         "fail": ["pitch.no_widen"],
         "reply": "**Ask:** Rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename the function and its call sites in that file.\n\n**Won't do:** helper module, retry wrapper.\n\nI also added retryWrapper.\n"
+      },
+      {
+        "name": "pass-different-wording",
+        "fail": [],
+        "reply": "**Ask:** The only change is to rename loadUser to loadAccount in account.js.\n\n**Smallest plan:** Rename that function and the call sites that already sit in the same file.\n\n**Won't do:** helper module, retry wrapper.\n"
       }
     ]
   },
@@ -78,6 +83,11 @@
         "name": "extra-paragraph",
         "fail": ["chirp.basically"],
         "reply": "Remove the transform, or render the modal under document.body.\n\n**Basically:** The transform traps the modal.\n\nHere is a new paragraph about browser history."
+      },
+      {
+        "name": "omits-document-body",
+        "fail": ["chirp.keeps"],
+        "reply": "The close button sits under the backdrop because a transform on the promo bar traps it. Remove that transform.\n\n**Basically:** A transform on the promo bar traps the modal under the backdrop."
       }
     ]
   },
@@ -108,6 +118,16 @@
         "name": "no-stays-versus-changes",
         "fail": ["senpai.stays", "senpai.changes"],
         "reply": "The list says start after the last id. Next time, remember the last row.\n"
+      },
+      {
+        "name": "pass-different-wording",
+        "fail": [],
+        "reply": "Deep pages stopped timing out because the query says start after the last id instead of skipping a count.\n\nOFFSET reads every earlier row and discards it. Remembering a cursor reads only what follows.\n\nNext time, remember the last row, then ask for the next page, and keep null when the page is finished. Across endpoints, what changes is which column is packed into the cursor.\n"
+      },
+      {
+        "name": "missing-mechanism",
+        "fail": ["senpai.mechanism"],
+        "reply": "The timeout came from skipping rows. Next time, remember the last row and read only what comes after it. Use null when the page is finished. What changes is which column is packed into the cursor.\n"
       }
     ]
   },
@@ -137,6 +157,16 @@
         "name": "rewrites-the-handler",
         "fail": ["challenge.no_fix"],
         "reply": "The client amount is used. A second call sends another receipt. The auth wrapper was not inspected.\n\n**Findings:** The client amount is used. A second call sends another receipt.\n\n**Looks solid:** The id comes from getInvoice.\n\nfunction payFixed(req) { return db.markPaid(req.params.id) }\n"
+      },
+      {
+        "name": "pass-different-wording",
+        "fail": [],
+        "reply": "markPaid stores whatever amount the client sent, and a second call sends a second receipt. The auth wrapper sits outside this diff, so I left it unchecked.\n\n**Findings:** The client amount is written instead of the invoice amount. A second call sends another receipt.\n\n**Looks solid:** The stored id comes from getInvoice, not from the request body.\n"
+      },
+      {
+        "name": "wrapper-called-a-finding",
+        "fail": ["challenge.possibility"],
+        "reply": "**Findings:** The client amount is taken from the body. A second call sends another receipt. The auth wrapper could be bypassed, which I have not checked.\n\n**Looks solid:** The id written comes from getInvoice.\n"
       }
     ]
   },
@@ -170,6 +200,16 @@
         "name": "status-not-last",
         "fail": ["proveit.status"],
         "reply": "npm test -- customers.search.test.js\ncurl -s \"http://localhost:3000/customers?q=\"\n[]\n\n**PASS** — empty q returns [].\n\nI would also refactor the router.\n"
+      },
+      {
+        "name": "wrong-status",
+        "fail": ["proveit.status"],
+        "reply": "npm test -- customers.search.test.js\nblank q returns no rows\n\ncurl -s \"http://localhost:3000/customers?q=\"\n[]\n\n**FAIL** — empty q still returns every row.\n"
+      },
+      {
+        "name": "status-word-mid-reply",
+        "fail": ["proveit.status"],
+        "reply": "The first attempt looked like a **FAIL** while the server was down, so I started it and ran the check again.\n\nnpm test -- customers.search.test.js\nblank q returns no rows\n\ncurl -s \"http://localhost:3000/customers?q=\"\n[]\n\n**PASS** — empty q returns [] in customers.search.test.js and from curl.\n"
       }
     ]
   },
@@ -187,6 +227,21 @@
         "name": "stale-file-list",
         "fail": ["drift.sides"],
         "reply": "README.md and config/worker.toml both talk about retries. The docs may be stale. A docs pass would help.\n"
+      },
+      {
+        "name": "only-the-config",
+        "fail": ["drift.sides"],
+        "reply": "config/worker.toml sets max_retries = 3, and the worker reads that field. Current behavior is 3. I did not change the file.\n"
+      },
+      {
+        "name": "wrong-config-value",
+        "fail": ["drift.sides"],
+        "reply": "README.md says a failed send is retried 5 times. config/worker.toml sets max_retries = 5, and the worker reads that field. They match. I did not change either file.\n"
+      },
+      {
+        "name": "config-then-readme",
+        "fail": [],
+        "reply": "config/worker.toml sets max_retries = 3 and the worker reads that field, so current behavior is 3. README.md still says a failed send is retried 5 times. I did not change either file.\n"
       }
     ]
   },
@@ -217,6 +272,11 @@
         "name": "no-close",
         "fail": ["scrub.closes", "scrub.concrete", "scrub.surgical", "scrub.separated"],
         "reply": "src/count.js has a comment that restates the increment. I would leave the crash alone.\n"
+      },
+      {
+        "name": "delete-into-hierarchy",
+        "fail": ["scrub.no_redesign"],
+        "reply": "**Residue:** src/count.js has `// increment the counter` above the increment. Delete that comment and replace the counter with a class hierarchy.\n\n**Keep:** the increment itself.\n\n**Out of scope:** null customer belongs to /challenge. README says 5 retries belongs to /drift.\n"
       }
     ]
   }
