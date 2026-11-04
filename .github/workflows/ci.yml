@@ -37,6 +37,9 @@ jobs:
       - name: Check Antigravity adapter
         run: python adapters/antigravity/check.py
 
+      - name: Check Claude adapter
+        run: python adapters/claude/check.py
+
       - name: Run shared conformance checks
         run: python conformance/check.py
 

@@ -8,17 +8,18 @@ An adapter may handle where instructions live, how commands are discovered/invok
 
 An adapter may **not** quietly change the meaning of a command.
 
-The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are `../conformance/`. The Cursor, Codex, and Antigravity checks call that module. `../orchestration/` is not an adapter and is not installed with one.
+The behavioral source of truth is `../core/COMMANDS.md`. Shared reply checks are `../conformance/`. The Cursor, Codex, Antigravity, and Claude checks call that module. `../orchestration/` is not an adapter and is not installed with one.
 
 ## Current targets
 
 - `codex/` — implemented. Deterministic check passes. LIVE VALIDATED for `$pitch` and `$prove-it`
 - `cursor/` — implemented. Deterministic check passes. LIVE VALIDATED for `/pitch` and `/prove-it`
 - `antigravity/` — implemented. Deterministic check passes. LIVE VALIDATED for `/pitch` and `/prove-it`. One `/pitch` run also surfaced `challenge`
+- `claude/` — implemented. Deterministic check passes. Live validation pending
 
 More adapters can be added later without changing the portable core.
 
-From this checkout, `python3 cricket install cursor|codex|antigravity --target /path/to/project` copies one adapter. See `docs/PORTABLE-CRICKET.md` for the files it writes and for the `.agents/skills` collision.
+From this checkout, `python3 cricket install cursor|codex|antigravity|claude --target /path/to/project` copies one adapter. See `docs/PORTABLE-CRICKET.md` for the files it writes and for the `.agents/skills` collision.
 
 ## Minimum bar for "implemented"
 

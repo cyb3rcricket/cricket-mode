@@ -1,0 +1,272 @@
+#!/usr/bin/env python3
+"""Install the Claude Code adapter and check discovery plus conformance.
+
+Copies the skill tree into a temporary project's `.claude/skills/` directory,
+discovers `SKILL.md` files the way Claude Code does, then runs the shared
+conformance suite. It does not open Claude Code.
+"""
+
+from __future__ import annotations
+
+import filecmp
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+COMMANDS = [
+    "pitch",
+    "chirp",
+    "senpai",
+    "challenge",
+    "prove-it",
+    "drift",
+    "scrub",
+]
+
+# Result-shape phrases that belong only in the shared contract.
+FORK_MARKERS = [
+    "Solve only what was asked. Ask before inventing.",
+    "**Basically:**",
+    "**Findings:**",
+    "**Looks solid:**",
+    "**PASS**",
+    "**FAIL**",
+    "**PARTIAL**",
+    "**Residue:**",
+    "**Keep:**",
+    "**Out of scope:**",
+    "Strip the agent fingerprints. Don't redesign the work.",
+    "Don't tell me it works. Prove it.",
+    "Try to break the idea before we trust it.",
+    "Find where the project disagrees with itself.",
+]
+
+SECTION_MARKERS = {
+    "pitch": ["**Ask:**", "**Smallest plan:**", "**Won't do:**"],
+    "chirp": ["**Basically:**"],
+    "senpai": ["recognize the pattern next time"],
+    "challenge": ["**Findings:**", "**Looks solid:**"],
+    "prove-it": ["**PASS**", "**FAIL**", "**PARTIAL**"],
+    "drift": ["what says one thing", "what says something different"],
+    "scrub": ["**Residue:**", "**Keep:**", "**Out of scope:**"],
+}
+
+
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def parse_frontmatter(text: str, path: Path) -> tuple[dict[str, str], str]:
+    if not text.startswith("---\n"):
+        raise SystemExit(f"{path}: missing opening frontmatter")
+    end = text.find("\n---\n", 4)
+    if end < 0:
+        raise SystemExit(f"{path}: missing closing frontmatter")
+    data: dict[str, str] = {}
+    for line in text[4:end].splitlines():
+        if not line.strip():
+            continue
+        if ":" not in line:
+            raise SystemExit(f"{path}: bad frontmatter line: {line}")
+        key, value = line.split(":", 1)
+        data[key.strip()] = value.strip().strip('"')
+    return data, text[end + 5 :]
+
+
+def expected_body(name: str) -> str:
+    return (
+        f"\n# /{name}\n\n"
+        f"Claude Code wiring for Cricket `/{name}`. This file does not define the behavior.\n\n"
+        f"Cricket adapter: claude\n\n"
+        f"Read `../cricket-contract/COMMANDS.md`. Follow only the section headed "
+        f"`/{name}` and the section headed `Cross-command invariants`. If that file "
+        f"is missing or unreadable, stop and say the Cricket contract is not installed.\n\n"
+        f"Do not invent a different purpose, scope boundary, evidence requirement, "
+        f"or result shape.\n"
+    )
+
+
+def section(contract: str, name: str) -> str:
+    heading = f"## `/{name}`\n"
+    start = contract.find(heading)
+    if start < 0:
+        raise SystemExit(f"core contract has no {heading.strip()} section")
+    rest = contract[start + len(heading) :]
+    nxt = rest.find("\n## ")
+    return rest if nxt < 0 else rest[:nxt]
+
+
+def install(source: Path, target_skills: Path) -> None:
+    target_skills.mkdir(parents=True)
+    try:
+        shutil.copytree(source, target_skills, dirs_exist_ok=True, symlinks=True)
+    except OSError:
+        shutil.copytree(source, target_skills, dirs_exist_ok=True, symlinks=False)
+    materialized = target_skills / "cricket-contract" / "COMMANDS.md"
+    # Remove the copied symlink before writing. Copying onto it can follow
+    # the link and overwrite core/COMMANDS.md.
+    materialized.unlink()
+    shutil.copyfile(repo_root() / "core" / "COMMANDS.md", materialized)
+
+
+def is_contract_link(link: Path, core: Path) -> bool:
+    if link.is_symlink():
+        try:
+            return link.resolve() == core.resolve()
+        except OSError:
+            return False
+    if link.is_file():
+        try:
+            target = link.read_text().strip()
+            return bool(target) and (link.parent / target).resolve() == core.resolve()
+        except (OSError, ValueError):
+            return False
+    return False
+
+
+def discover(skills_root: Path) -> dict[str, Path]:
+    found: dict[str, Path] = {}
+    for path in sorted(skills_root.rglob("SKILL.md")):
+        name = path.parent.name
+        if name in found:
+            raise SystemExit(f"duplicate skill name {name}: {path}")
+        found[name] = path
+    return found
+
+
+def main() -> int:
+    root = repo_root()
+    source = root / "adapters" / "claude" / "skills"
+    core = root / "core" / "COMMANDS.md"
+    link = source / "cricket-contract" / "COMMANDS.md"
+    if not is_contract_link(link, core):
+        raise SystemExit(f"{link} is not a symlink to the core contract")
+
+    failures: list[str] = []
+    with tempfile.TemporaryDirectory(prefix="cricket-claude-") as tmp:
+        project = Path(tmp) / "project"
+        skills_root = project / ".claude" / "skills"
+        install(source, skills_root)
+        installed_contract = skills_root / "cricket-contract" / "COMMANDS.md"
+
+        found = discover(skills_root)
+        extra = sorted(set(found) - set(COMMANDS))
+        missing = [name for name in COMMANDS if name not in found]
+        if extra:
+            failures.append(f"unexpected skills discovered: {extra}")
+        if missing:
+            failures.append(f"skills not discovered: {missing}")
+
+        for name in COMMANDS:
+            if name not in found:
+                continue
+            skill_path = found[name]
+            text = skill_path.read_text()
+            meta, body = parse_frontmatter(text, skill_path)
+            if meta.get("name") != name:
+                failures.append(f"{name}: frontmatter name is {meta.get('name')!r}")
+            if f"/{name}" not in meta.get("description", ""):
+                failures.append(f"{name}: description does not name /{name}")
+            if meta.get("disable-model-invocation") != "true":
+                failures.append(f"{name}: disable-model-invocation is not true")
+            if body != expected_body(name):
+                failures.append(f"{name}: skill body is not the thin wrapper")
+            for marker in FORK_MARKERS:
+                if marker in body or marker in meta.get("description", ""):
+                    failures.append(f"{name}: semantic fork marker in skill: {marker}")
+            if (skill_path.parent / "agents" / "openai.yaml").exists():
+                failures.append(f"{name}: agents/openai.yaml is present")
+
+        if installed_contract.is_symlink():
+            failures.append("installed contract is still a symlink")
+        if not installed_contract.is_file() or not filecmp.cmp(installed_contract, core, shallow=False):
+            failures.append("installed contract bytes differ from core/COMMANDS.md")
+
+        contract_text = installed_contract.read_text()
+        if "## Cross-command invariants" not in contract_text:
+            failures.append("installed contract missing cross-command invariants")
+
+        print(f"installed: {skills_root}")
+        print(
+            f"contract: {installed_contract} "
+            f"({installed_contract.stat().st_size} bytes, not a symlink)"
+        )
+        for name in COMMANDS:
+            if name not in found:
+                continue
+            skill_path = found[name]
+            meta, _body = parse_frontmatter(skill_path.read_text(), skill_path)
+            contract_path = (skill_path.parent / "../cricket-contract/COMMANDS.md").resolve()
+            chunk = section(contract_path.read_text(), name)
+            absent = [marker for marker in SECTION_MARKERS[name] if marker not in chunk]
+            if absent:
+                failures.append(f"{name}: contract section missing {absent}")
+            rel = skill_path.relative_to(project)
+            print(
+                f"/{name}  discover={rel}  invoke=/{meta['name']}  "
+                f"explicit={meta['disable-model-invocation']}  "
+                f"section=## /{name} ({len(chunk)} chars)"
+            )
+
+        backup = installed_contract.read_bytes()
+        installed_contract.unlink()
+        for name in COMMANDS:
+            if name not in found:
+                continue
+            skill_path = found[name]
+            contract_path = (skill_path.parent / "../cricket-contract/COMMANDS.md").resolve()
+            if contract_path.exists():
+                failures.append(
+                    f"{name}: contract still readable after removal at {contract_path}"
+                )
+            if "../cricket-contract/COMMANDS.md" not in skill_path.read_text():
+                failures.append(f"{name}: wrapper does not point at the contract")
+        installed_contract.write_bytes(backup)
+
+    if failures:
+        print("FAIL")
+        for item in failures:
+            print(f"- {item}")
+        return 1
+
+    sys.path.insert(0, str(root))
+    from conformance import evaluate, load_cases
+
+    for case in load_cases():
+        sample = next(item for item in case["samples"] if item["fail"] == [])
+        got = evaluate(case["command"], sample["reply"], case)
+        print(f"/{case['command']}  conformance-pass={got or 'ok'}")
+        if got != []:
+            failures.append(f"{case['command']} pass sample failed conformance: {got}")
+
+    suite = subprocess.run(
+        [sys.executable, str(root / "conformance" / "check.py")],
+        cwd=root,
+        text=True,
+        capture_output=True,
+    )
+    if suite.returncode != 0:
+        failures.append("conformance/check.py failed")
+        print(suite.stdout)
+        print(suite.stderr)
+    else:
+        print("conformance/check.py PASS")
+
+    if failures:
+        print("FAIL")
+        for item in failures:
+            print(f"- {item}")
+        return 1
+    print("PASS")
+    print(f"discovered {len(COMMANDS)} Claude Code skills; pass samples match conformance/")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except subprocess.CalledProcessError as exc:
+        print(f"FAIL\n- command failed: {exc}")
+        sys.exit(1)
